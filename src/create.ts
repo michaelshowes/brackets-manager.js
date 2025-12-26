@@ -81,6 +81,8 @@ export class Create {
      * @returns The created stage.
      */
     private async createDefaultStage(tournamentId: Id): Promise<Stage> {
+        const id = uuidv4();
+
         const stageData: OmitId<Stage> = {
             tournament_id: tournamentId,
             name: 'Bracket',
@@ -92,15 +94,18 @@ export class Create {
             },
         };
 
-        const stageId = (await this.storage.insert('stage', stageData)) as
-            | number
-            | boolean
-            | string;
+        const insertData = { id, ...stageData };
+        const insertedId = (await this.storage.insert(
+            'stage',
+            insertData as OmitId<Stage>,
+        )) as number | boolean | string;
 
-        if (stageId === -1 || stageId === false || stageId === '')
+        if (insertedId === -1 || insertedId === false || insertedId === '')
             throw Error('Could not insert the default stage in the database.');
 
-        return { id: stageId as Id, ...stageData };
+        const finalId = typeof insertedId === 'string' ? insertedId : id;
+
+        return { id: finalId as Id, ...stageData };
     }
 
     /**
@@ -110,20 +115,25 @@ export class Create {
      * @returns The created group.
      */
     private async createDefaultGroup(stageId: Id): Promise<Group> {
+        const id = uuidv4();
+
         const groupData: OmitId<Group> = {
             stage_id: stageId,
             number: 1,
         };
 
-        const groupId = (await this.storage.insert('group', groupData)) as
-            | number
-            | boolean
-            | string;
+        const insertData = { id, ...groupData };
+        const insertedId = (await this.storage.insert(
+            'group',
+            insertData as OmitId<Group>,
+        )) as number | boolean | string;
 
-        if (groupId === -1 || groupId === false || groupId === '')
+        if (insertedId === -1 || insertedId === false || insertedId === '')
             throw Error('Could not insert the default group in the database.');
 
-        return { id: groupId as Id, ...groupData };
+        const finalId = typeof insertedId === 'string' ? insertedId : id;
+
+        return { id: finalId as Id, ...groupData };
     }
 
     /**
