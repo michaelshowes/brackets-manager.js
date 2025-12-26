@@ -19,6 +19,8 @@ export interface Tournament {
     id: Id;
     /** Name of the tournament. */
     name: string;
+    /** URL-friendly slug derived from the tournament name. */
+    slug: string;
     /** Description of the tournament. */
     description?: string | null;
     /** Start date of the tournament. */
@@ -35,6 +37,8 @@ export interface Tournament {
 export interface InputTournament {
     /** Name of the tournament. */
     name: string;
+    /** Optional custom slug. If not provided, one will be generated from the name. */
+    slug?: string;
     /** Description of the tournament. */
     description?: string | null;
     /** Start date of the tournament. */

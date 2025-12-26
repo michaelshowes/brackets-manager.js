@@ -4,6 +4,22 @@ import { InputTournament, OmitId, Storage, Tournament } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
+ * Generates a URL-friendly slug from a string.
+ *
+ * @param text The text to convert to a slug.
+ * @returns A lowercase, hyphenated slug.
+ */
+function generateSlug(text: string): string {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+}
+
+/**
  * Result returned when creating a tournament with auto-created stage and group.
  */
 export interface TournamentCreationResult {
@@ -37,10 +53,12 @@ export class Create {
         data: InputTournament,
     ): Promise<TournamentCreationResult> {
         const id = uuidv4();
+        const slug = data.slug || generateSlug(data.name);
 
         /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
         const tournamentData: OmitId<Tournament> = {
             name: data.name,
+            slug,
             description: data.description ?? null,
             start_date: data.start_date ? new Date(data.start_date) : null,
             end_date: data.end_date ? new Date(data.end_date) : null,
