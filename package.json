@@ -51,19 +51,5 @@
         "brackets",
         "manager",
         "database"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/Drarig29/brackets-manager.js.git"
-    },
-    "author": "Corentin Girard",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/Drarig29/brackets-manager.js/issues"
-    },
-    "homepage": "https://github.com/Drarig29/brackets-manager.js#readme",
-    "volta": {
-        "node": "14.21.3",
-        "npm": "7.24.2"
-    }
+    ]
 }
