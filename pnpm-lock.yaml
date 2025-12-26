@@ -34,8 +34,8 @@ importers:
         specifier: ^5.42.0
         version: 5.62.0(eslint@8.57.1)(typescript@4.9.5)
       brackets-drizzle-db:
-        specifier: ^2.1.0
-        version: 2.1.0(brackets-manager@1.8.1)
+        specifier: ^2.1.1
+        version: 2.1.1(brackets-manager@1.8.1)
       brackets-json-db:
         specifier: 1.0.2
         version: 1.0.2(brackets-manager@1.8.1)
@@ -378,8 +378,8 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  brackets-drizzle-db@2.1.0:
-    resolution: {integrity: sha512-ekMmv7MEaXkRzDSYXyGanssl9JCozDbL4/oSKtb+u9TpwiuBaRJcEysGxT4SW6BDjWNLBTttVP0AnrgdcMK+/g==}
+  brackets-drizzle-db@2.1.1:
+    resolution: {integrity: sha512-wuhJSTu7AGLCRKWeZNgTDzYJzMU6GgTsiSI27shkSCk49RmU0JrIUCoEU6wSGRSTETkFHHVxcQo4odWcAeupOA==}
     peerDependencies:
       brackets-manager: 1.x
 
@@ -2142,7 +2142,7 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  brackets-drizzle-db@2.1.0(brackets-manager@1.8.1):
+  brackets-drizzle-db@2.1.1(brackets-manager@1.8.1):
     dependencies:
       brackets-manager: 1.8.1
       brackets-model: 1.6.0

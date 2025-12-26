@@ -14,6 +14,49 @@ export class Delete {
     }
 
     /**
+     * Deletes a tournament and all its components:
+     *
+     * - Stages (and their groups, rounds, matches, match games)
+     * - Participants
+     * - The tournament itself
+     *
+     * @param tournamentId ID of the tournament.
+     */
+    public async tournament(tournamentId: Id): Promise<void> {
+        // First, delete all stages and their components
+        await this.tournamentStages(tournamentId);
+
+        // Delete participants
+        if (
+            !(await this.storage.delete('participant', {
+                tournament_id: tournamentId,
+            }))
+        )
+            throw Error('Could not delete participants.');
+
+        // Finally, delete the tournament itself
+        if (!(await this.storage.delete('tournament', { id: tournamentId })))
+            throw Error('Could not delete the tournament.');
+    }
+
+    /**
+     * Deletes **only the stages** of a tournament (and all their components, see {@link stage | delete.stage()}).
+     *
+     * This does not delete the related participants or the tournament itself.
+     *
+     * @param tournamentId ID of the tournament.
+     */
+    public async tournamentStages(tournamentId: Id): Promise<void> {
+        const stages = await this.storage.select('stage', {
+            tournament_id: tournamentId,
+        });
+        if (!stages) throw Error('Error getting the stages.');
+
+        // Not doing this in a `Promise.all()` since this can be a heavy operation.
+        for (const stage of stages) await this.stage(stage.id);
+    }
+
+    /**
      * Deletes a stage, and all its components:
      *
      * - Groups
@@ -42,22 +85,5 @@ export class Delete {
 
         if (!(await this.storage.delete('stage', { id: stageId })))
             throw Error('Could not delete the stage.');
-    }
-
-    /**
-     * Deletes **the stages** of a tournament (and all their components, see {@link stage | delete.stage()}).
-     *
-     * This does not delete the related participants and you are responsible for deleting the tournament itself.
-     *
-     * @param tournamentId ID of the tournament.
-     */
-    public async tournament(tournamentId: Id): Promise<void> {
-        const stages = await this.storage.select('stage', {
-            tournament_id: tournamentId,
-        });
-        if (!stages) throw Error('Error getting the stages.');
-
-        // Not doing this in a `Promise.all()` since this can be a heavy operation.
-        for (const stage of stages) await this.stage(stage.id);
     }
 }

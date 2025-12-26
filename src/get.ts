@@ -13,6 +13,7 @@ import {
     FinalStandingsItem,
     ParticipantSlot,
     StageData,
+    Tournament,
     type RoundRobinFinalStandingsItem,
     type RoundRobinFinalStandingsOptions,
 } from './types';
@@ -20,6 +21,17 @@ import { BaseGetter } from './base/getter';
 import * as helpers from './helpers';
 
 export class Get extends BaseGetter {
+    /**
+     * Returns a tournament by its ID.
+     *
+     * @param tournamentId ID of the tournament.
+     */
+    public async tournament(tournamentId: Id): Promise<Tournament> {
+        const tournament = await this.storage.select('tournament', tournamentId);
+        if (!tournament) throw Error('Tournament not found.');
+        return tournament;
+    }
+
     /**
      * Returns the data needed to display a stage.
      *
