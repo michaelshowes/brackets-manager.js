@@ -6,7 +6,7 @@ import {
     Tournament,
 } from './types';
 import { InputStage, Stage } from 'brackets-model';
-import { Create } from './create';
+import { Create, TournamentCreationResult } from './create';
 import { Get } from './get';
 import { Update } from './update';
 import { Delete } from './delete';
@@ -25,12 +25,12 @@ export interface CallableCreate extends Create {
     (stage: InputStage): Promise<Stage>;
 
     /**
-     * Creates a tournament.
+     * Creates a tournament with an auto-created stage and group.
      *
      * @param data The tournament to create.
-     * @returns The created tournament.
+     * @returns The created tournament, stage, and group.
      */
-    tournament(data: InputTournament): Promise<Tournament>;
+    tournament(data: InputTournament): Promise<TournamentCreationResult>;
 }
 
 type CrudMethod = (table: string, ...args: unknown[]) => Promise<unknown>;

@@ -38,3 +38,4 @@ export { Find } from './find';
 export { Reset } from './reset';
 export { Delete } from './delete';
 export { StageCreator } from './base/stage/creator';
+export { TournamentCreationResult } from './create';
