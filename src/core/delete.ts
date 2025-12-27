@@ -1,4 +1,4 @@
-import { Id } from 'brackets-model';
+import { Id } from '@/model';
 import { Storage } from './types';
 
 export class Delete {

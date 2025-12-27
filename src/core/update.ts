@@ -7,7 +7,7 @@ import {
     Seeding,
     SeedOrdering,
     Status,
-} from 'brackets-model';
+} from '@/model';
 import { ordering } from './ordering';
 import { BaseUpdater } from './base/updater';
 import { ChildCountLevel, DeepPartial } from './types';

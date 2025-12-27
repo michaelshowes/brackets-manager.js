@@ -1,4 +1,4 @@
-import { Id, Status } from 'brackets-model';
+import { Id, Status } from '@/model';
 import { BaseUpdater } from './base/updater';
 import * as helpers from './helpers';
 

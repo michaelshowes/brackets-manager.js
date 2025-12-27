@@ -1,4 +1,5 @@
-export { BracketsManager, CallableCreate } from './manager';
+// Core exports
+export { BracketsManager, CallableCreate } from '@/core/manager';
 
 export {
     CrudInterface,
@@ -27,15 +28,26 @@ export {
     InputTournament,
     StageData,
     StageDataTypes,
-} from './types';
+} from '@/core/types';
 
-export * as helpers from './helpers';
-export { ordering } from './ordering';
+export * as helpers from '@/core/helpers';
+export { ordering } from '@/core/ordering';
 
-export { Get } from './get';
-export { Update } from './update';
-export { Find } from './find';
-export { Reset } from './reset';
-export { Delete } from './delete';
-export { StageCreator } from './base/stage/creator';
-export { TournamentCreationResult } from './create';
+export { Get } from '@/core/get';
+export { Update } from '@/core/update';
+export { Find } from '@/core/find';
+export { Reset } from '@/core/reset';
+export { Delete } from '@/core/delete';
+export { StageCreator } from '@/core/base/stage/creator';
+export { TournamentCreationResult } from '@/core/create';
+
+// Model exports (types from brackets-model)
+export * from '@/model';
+
+// Storage exports - namespaced to avoid type conflicts
+export { createStorage } from '@/storage/drizzle/storage';
+export { createDatabase } from '@/storage/drizzle/db';
+export type { DrizzleDatabase } from '@/storage/drizzle/db';
+
+// Export drizzle schema as a namespace to avoid conflicts with model types
+export * as drizzleSchema from '@/storage/drizzle/db/schema';

@@ -1,4 +1,4 @@
-import { Match, MatchGame, Seeding, Stage, Status, GroupType, Id, IdSeeding } from 'brackets-model';
+import { Match, MatchGame, Seeding, Stage, Status, GroupType, Id, IdSeeding } from '@/model';
 import { DeepPartial, ParticipantSlot, Side } from '../types';
 import { SetNextOpponent } from '../helpers';
 import { ordering } from '../ordering';

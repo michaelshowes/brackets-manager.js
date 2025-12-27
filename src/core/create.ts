@@ -1,4 +1,4 @@
-import { InputStage, Stage, Id, Group } from 'brackets-model';
+import { InputStage, Stage, Id, Group } from '@/model';
 import { StageCreator } from './base/stage/creator';
 import { InputTournament, OmitId, Storage, Tournament } from './types';
 import { v4 as uuidv4 } from 'uuid';

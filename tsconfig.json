@@ -6,6 +6,19 @@
         "declaration": true,
         "declarationMap": true,
         "sourceMap": true,
-        "outDir": "dist/"
-    }
+        "outDir": "dist/",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["./*"],
+            "@/core/*": ["./core/*"],
+            "@/model": ["./model"],
+            "@/model/*": ["./model/*"],
+            "@/storage/*": ["./storage/*"],
+            "@/storage/drizzle": ["./storage/drizzle"],
+            "@/storage/drizzle/*": ["./storage/drizzle/*"]
+        }
+    },
+    "include": ["src/**/*"]
 }

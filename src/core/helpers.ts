@@ -17,7 +17,7 @@ import {
     Id,
     RankingItem,
     RankingFormula,
-} from 'brackets-model';
+} from '@/model';
 
 import {
     Database,

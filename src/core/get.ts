@@ -8,7 +8,7 @@ import {
     Status,
     Id,
     RankingItem,
-} from 'brackets-model';
+} from '@/model';
 import {
     FinalStandingsItem,
     ParticipantSlot,

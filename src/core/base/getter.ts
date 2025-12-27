@@ -1,5 +1,5 @@
 import { DeepPartial, Storage } from '../types';
-import { Group, Match, MatchGame, Round, SeedOrdering, Stage, StageType, GroupType, Id } from 'brackets-model';
+import { Group, Match, MatchGame, Round, SeedOrdering, Stage, StageType, GroupType, Id } from '@/model';
 import { RoundPositionalInfo } from '../types';
 import { StageCreator } from './stage/creator';
 import * as helpers from '../helpers';

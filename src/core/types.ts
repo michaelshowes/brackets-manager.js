@@ -9,7 +9,7 @@ import {
     Stage,
     RankingFormula,
     RankingItem,
-} from 'brackets-model';
+} from '@/model';
 
 /**
  * A tournament that can contain multiple stages and participants.

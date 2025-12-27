@@ -1,4 +1,4 @@
-import { Group, Id, Match, MatchGame } from 'brackets-model';
+import { Group, Id, Match, MatchGame } from '@/model';
 import { BaseGetter } from './base/getter';
 import * as helpers from './helpers';
 

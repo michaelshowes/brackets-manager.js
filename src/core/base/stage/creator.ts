@@ -1,7 +1,7 @@
-import { Group, Id, InputStage, Match, MatchGame, Participant, Round, Seeding, SeedOrdering, Stage } from 'brackets-model';
+import { Group, Id, InputStage, Match, MatchGame, Participant, Round, Seeding, SeedOrdering, Stage } from '@/model';
 import { defaultMinorOrdering, ordering } from '../../ordering';
 import { Duel, Storage, OmitId, ParticipantSlot, StandardBracketResults } from '../../types';
-import { BracketsManager } from '../..';
+import { BracketsManager } from '../../manager';
 import * as helpers from '../../helpers';
 
 /**

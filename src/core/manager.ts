@@ -5,7 +5,7 @@ import {
     Storage,
     Tournament,
 } from './types';
-import { InputStage, Stage } from 'brackets-model';
+import { InputStage, Stage } from '@/model';
 import { Create, TournamentCreationResult } from './create';
 import { Get } from './get';
 import { Update } from './update';
