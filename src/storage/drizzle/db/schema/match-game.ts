@@ -1,8 +1,8 @@
-import { integer, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
-import { stage } from './stage';
-import { match } from './match';
 import type { ParticipantResult } from '@/model';
+import { relations } from 'drizzle-orm';
+import { integer, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
+import { match } from './match';
+import { stage } from './stage';
 
 // A game within a match.
 export const matchGame = pgTable('match_game', {

@@ -11,13 +11,13 @@ import { Id, StageType } from './unions';
  */
 export interface Participant {
     /** ID of the participant. */
-    id: Id,
+    id: Id;
 
     /** ID of the tournament this participant belongs to. */
-    tournament_id: Id,
+    tournament_id: Id;
 
     /** Name of the participant. */
-    name: string,
+    name: string;
 }
 
 /**
@@ -25,22 +25,22 @@ export interface Participant {
  */
 export interface Stage {
     /** ID of the stage. */
-    id: Id,
+    id: Id;
 
     /** ID of the tournament this stage belongs to. */
-    tournament_id: Id,
+    tournament_id: Id;
 
     /** Name of the stage. */
-    name: string,
+    name: string;
 
     /** Type of the stage. */
-    type: StageType,
+    type: StageType;
 
     /** Settings of the stage. */
-    settings: StageSettings,
+    settings: StageSettings;
 
     /** The number of the stage in its tournament. */
-    number: number,
+    number: number;
 }
 
 /**
@@ -48,13 +48,13 @@ export interface Stage {
  */
 export interface Group {
     /** ID of the group. */
-    id: Id,
+    id: Id;
 
     /** ID of the parent stage. */
-    stage_id: Id,
+    stage_id: Id;
 
     /** The number of the group in its stage. */
-    number: number,
+    number: number;
 }
 
 // The next levels don't have a `name` property. They are automatically named with their `number` and their context (parent levels).
@@ -64,16 +64,16 @@ export interface Group {
  */
 export interface Round {
     /** ID of the round. */
-    id: Id,
+    id: Id;
 
     /** ID of the parent stage. */
-    stage_id: Id,
+    stage_id: Id;
 
     /** ID of the parent group. */
-    group_id: Id,
+    group_id: Id;
 
     /** The number of the round in its group. */
-    number: number,
+    number: number;
 }
 
 /**
@@ -81,22 +81,22 @@ export interface Round {
  */
 export interface Match extends MatchResults {
     /** ID of the match. */
-    id: Id,
+    id: Id;
 
     /** ID of the parent stage. */
-    stage_id: Id,
+    stage_id: Id;
 
     /** ID of the parent group. */
-    group_id: Id,
+    group_id: Id;
 
     /** ID of the parent round. */
-    round_id: Id,
+    round_id: Id;
 
     /** The number of the match in its round. */
-    number: number,
+    number: number;
 
     /** The count of match games this match has. Can be `0` if it's a simple match, or a positive number for "Best Of" matches. */
-    child_count: number,
+    child_count: number;
 }
 
 /**
@@ -104,14 +104,14 @@ export interface Match extends MatchResults {
  */
 export interface MatchGame extends MatchResults {
     /** ID of the match game. */
-    id: Id,
+    id: Id;
 
     /** ID of the parent stage. */
-    stage_id: Id,
+    stage_id: Id;
 
     /** ID of the parent match. */
-    parent_id: Id,
+    parent_id: Id;
 
     /** The number of the match game in its parent match. */
-    number: number,
+    number: number;
 }

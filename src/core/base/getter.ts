@@ -1,26 +1,19 @@
-import { DeepPartial } from '../types';
 import {
     Group,
+    GroupType,
+    Id,
     Match,
     MatchGame,
     Round,
     SeedOrdering,
     Stage,
     StageType,
-    GroupType,
-    Id,
 } from '@/model';
-import { RoundPositionalInfo } from '../types';
-import { StageCreator } from './stage/creator';
-import * as helpers from '../helpers';
 import type { DrizzleDatabase } from '../db';
-import {
-    stageDb,
-    groupDb,
-    roundDb,
-    matchDb,
-    matchGameDb,
-} from '../db';
+import { groupDb, matchDb, matchGameDb, roundDb } from '../db';
+import * as helpers from '../helpers';
+import { DeepPartial, RoundPositionalInfo } from '../types';
+import { StageCreator } from './stage/creator';
 
 export class BaseGetter {
     protected readonly db: DrizzleDatabase;
@@ -69,7 +62,8 @@ export class BaseGetter {
     ): Promise<Round[]> {
         // Getting all rounds instead of cherry-picking them is the least expensive.
         const rounds = await roundDb.getByStage(this.db, stageId);
-        if (!rounds || rounds.length === 0) throw Error('Error getting rounds.');
+        if (!rounds || rounds.length === 0)
+            throw Error('Error getting rounds.');
 
         const loserBracket = await this.getLoserBracket(stageId);
         if (!loserBracket) throw Error('Loser bracket not found.');
@@ -96,7 +90,8 @@ export class BaseGetter {
         if (!round) throw Error('Round not found.');
 
         const rounds = await roundDb.getByGroup(this.db, round.group_id);
-        if (!rounds || rounds.length === 0) throw Error('Error getting rounds.');
+        if (!rounds || rounds.length === 0)
+            throw Error('Error getting rounds.');
 
         return {
             roundNumber: round.number,
@@ -144,7 +139,10 @@ export class BaseGetter {
         if (stage.type === 'single_elimination')
             return this.getPreviousMatchesFinalSingleElimination(match, stage);
 
-        return this.getPreviousMatchesFinalDoubleElimination(match, roundNumber);
+        return this.getPreviousMatchesFinalDoubleElimination(
+            match,
+            roundNumber,
+        );
     }
 
     /**
@@ -357,9 +355,19 @@ export class BaseGetter {
                     roundCount,
                 );
             case 'winner_bracket':
-                return this.getNextMatchesWB(match, stage, roundNumber, roundCount);
+                return this.getNextMatchesWB(
+                    match,
+                    stage,
+                    roundNumber,
+                    roundCount,
+                );
             case 'loser_bracket':
-                return this.getNextMatchesLB(match, stage, roundNumber, roundCount);
+                return this.getNextMatchesLB(
+                    match,
+                    stage,
+                    roundNumber,
+                    roundCount,
+                );
             case 'final_group':
                 return this.getNextMatchesFinal(
                     match,
@@ -416,7 +424,11 @@ export class BaseGetter {
                 roundNumber,
                 roundCount,
             )), // Can be `null`, to denote that the winner goes nowhere, e.g. in `WB Final`.
-            await this.findMatch(loserBracket.id, roundNumberLB, actualMatchNumberLB),
+            await this.findMatch(
+                loserBracket.id,
+                roundNumberLB,
+                actualMatchNumberLB,
+            ),
         ];
     }
 
@@ -469,7 +481,9 @@ export class BaseGetter {
                 match.stage_id,
                 stageType,
             );
-            const consolationFinal = await this.getFinalGroupFirstMatch(finalGroupId);
+            const consolationFinal = await this.getFinalGroupFirstMatch(
+                finalGroupId,
+            );
             return [
                 await this.getDiagonalMatch(
                     match.group_id,
@@ -483,7 +497,11 @@ export class BaseGetter {
         if (roundNumber === roundCount) return [];
 
         return [
-            await this.getDiagonalMatch(match.group_id, roundNumber, match.number),
+            await this.getDiagonalMatch(
+                match.group_id,
+                roundNumber,
+                match.number,
+            ),
         ];
     }
 
@@ -510,7 +528,11 @@ export class BaseGetter {
         }
 
         return [
-            await this.getDiagonalMatch(match.group_id, roundNumber, match.number),
+            await this.getDiagonalMatch(
+                match.group_id,
+                roundNumber,
+                match.number,
+            ),
         ];
     }
 
@@ -534,7 +556,9 @@ export class BaseGetter {
                 stage.type,
             );
             const consolationFinal =
-                await this.getConsolationFinalMatchDoubleElimination(finalGroupId);
+                await this.getConsolationFinalMatchDoubleElimination(
+                    finalGroupId,
+                );
             return [
                 ...(await this.getMatchAfterMajorRoundLB(match, roundNumber)), // Winner follows.
                 ...(consolationFinal ? [consolationFinal] : []), // Loser goes in consolation.
@@ -548,7 +572,9 @@ export class BaseGetter {
             );
             const grandFinal = await this.getFinalGroupFirstMatch(finalGroupId);
             const consolationFinal =
-                await this.getConsolationFinalMatchDoubleElimination(finalGroupId);
+                await this.getConsolationFinalMatchDoubleElimination(
+                    finalGroupId,
+                );
 
             return [
                 grandFinal, // Null if no grand final.
@@ -628,7 +654,11 @@ export class BaseGetter {
         roundNumber: number,
     ): Promise<Match[]> {
         return [
-            await this.getParallelMatch(match.group_id, roundNumber, match.number),
+            await this.getParallelMatch(
+                match.group_id,
+                roundNumber,
+                match.number,
+            ),
         ];
     }
 
@@ -643,7 +673,11 @@ export class BaseGetter {
         roundNumber: number,
     ): Promise<Match[]> {
         return [
-            await this.getDiagonalMatch(match.group_id, roundNumber, match.number),
+            await this.getDiagonalMatch(
+                match.group_id,
+                roundNumber,
+                match.number,
+            ),
         ];
     }
 

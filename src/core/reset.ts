@@ -24,7 +24,10 @@ export class Reset extends BaseUpdater {
         const { roundNumber, roundCount } = await this.getRoundPositionalInfo(
             stored.round_id,
         );
-        const matchLocation = helpers.getMatchLocation(stage.type, group.number);
+        const matchLocation = helpers.getMatchLocation(
+            stage.type,
+            group.number,
+        );
         const nextMatches = await this.getNextMatches(
             stored,
             matchLocation,
@@ -37,7 +40,9 @@ export class Reset extends BaseUpdater {
             !helpers.isMatchUpdateLocked(stored) &&
             this.isMatchLinkedWithUnlockedNextMatches(nextMatches)
         )
-            throw Error('The match is linked to other matches that need to be reset first.');
+            throw Error(
+                'The match is linked to other matches that need to be reset first.',
+            );
 
         helpers.resetMatchResults(stored);
         await this.updateMatch(stored, stored);
@@ -80,6 +85,8 @@ export class Reset extends BaseUpdater {
     private isMatchLinkedWithUnlockedNextMatches(
         nextMatches: (Match | null)[],
     ): boolean {
-        return nextMatches.some((match) => match && match.status >= Status.Ready);
+        return nextMatches.some(
+            (match) => match && match.status >= Status.Ready,
+        );
     }
 }

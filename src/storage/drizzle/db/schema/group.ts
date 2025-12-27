@@ -1,8 +1,8 @@
-import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { stage } from './stage';
-import { round } from './round';
+import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { match } from './match';
+import { round } from './round';
+import { stage } from './stage';
 
 // A group of a stage.
 export const group = pgTable('group', {

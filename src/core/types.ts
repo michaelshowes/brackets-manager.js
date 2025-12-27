@@ -4,11 +4,11 @@ import {
     Match,
     MatchGame,
     Participant,
+    RankingFormula,
+    RankingItem,
     Round,
     SeedOrdering,
     Stage,
-    RankingFormula,
-    RankingItem,
 } from '@/model';
 
 /**

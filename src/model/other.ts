@@ -32,19 +32,19 @@ export enum Status {
  */
 export interface ParticipantResult {
     /** If `null`, the participant is to be determined. */
-    id: Id | null,
+    id: Id | null;
 
     /** Indicates where the participant comes from. */
-    position?: number,
+    position?: number;
 
     /** If this participant forfeits, the other automatically wins. */
-    forfeit?: boolean,
+    forfeit?: boolean;
 
     /** The current score of the participant. */
-    score?: number,
+    score?: number;
 
     /** Tells what is the result of a duel for this participant. */
-    result?: Result,
+    result?: Result;
 }
 
 /**
@@ -52,13 +52,13 @@ export interface ParticipantResult {
  */
 export interface MatchResults {
     /** Status of the match. */
-    status: Status,
+    status: Status;
 
     /** First opponent of the match. */
-    opponent1: ParticipantResult | null,
+    opponent1: ParticipantResult | null;
 
     /** Second opponent of the match. */
-    opponent2: ParticipantResult | null,
+    opponent2: ParticipantResult | null;
 }
 
 /**
@@ -66,27 +66,27 @@ export interface MatchResults {
  */
 export interface RankingItem {
     /** ID of the participant. */
-    id: Id,
+    id: Id;
     /** Number of matches played by the participant. */
-    played: number,
+    played: number;
     /** Number of matches won by the participant. */
-    wins: number,
+    wins: number;
     /** Number of matches that ended in a draw. */
-    draws: number,
+    draws: number;
     /** Number of matches lost by the participant. */
-    losses: number,
+    losses: number;
     /** Number of matches forfeited by the participant. */
-    forfeits: number,
+    forfeits: number;
     /** Total score in favor of the participant. */
-    scoreFor: number,
+    scoreFor: number;
     /** Total score in favor of the opponents. */
-    scoreAgainst: number,
+    scoreAgainst: number;
     /** Difference between {@link scoreFor} and {@link scoreAgainst}. */
-    scoreDifference: number,
+    scoreDifference: number;
     /** Total points of the participant. */
-    points: number,
+    points: number;
     /** Resulting rank of the participant. */
-    rank: number,
+    rank: number;
 }
 
 /**

@@ -291,7 +291,10 @@ export class Update extends BaseUpdater {
     ): Promise<void> {
         for (const match of matches) {
             const updated = { ...match };
-            updated.opponent1 = helpers.findPosition(matches, positions.shift()!);
+            updated.opponent1 = helpers.findPosition(
+                matches,
+                positions.shift()!,
+            );
 
             // The only rounds where we have a second ordered participant are first rounds of brackets (upper and lower).
             if (roundNumber === 1) {

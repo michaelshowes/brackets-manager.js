@@ -1,11 +1,15 @@
 import {
+    CustomParticipant,
     GrandFinalType,
+    GroupType,
+    Id,
     Match,
     MatchGame,
     MatchResults,
     Participant,
     ParticipantResult,
-    CustomParticipant,
+    RankingFormula,
+    RankingItem,
     Result,
     RoundRobinMode,
     Seeding,
@@ -13,12 +17,9 @@ import {
     Stage,
     StageType,
     Status,
-    GroupType,
-    Id,
-    RankingItem,
-    RankingFormula,
 } from '@/model';
 
+import { ordering } from './ordering';
 import {
     Database,
     DeepPartial,
@@ -32,7 +33,6 @@ import {
     Scores,
     Side,
 } from './types';
-import { ordering } from './ordering';
 
 /**
  * Checks whether a value is defined (i.e. not null nor undefined).

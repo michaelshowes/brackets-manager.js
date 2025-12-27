@@ -1,14 +1,25 @@
 import {
-    Stage,
     Group,
-    Round,
+    Id,
     Match,
     MatchGame,
     Participant,
-    Status,
-    Id,
     RankingItem,
+    Round,
+    Stage,
+    Status,
 } from '@/model';
+import { BaseGetter } from './base/getter';
+import {
+    groupDb,
+    matchDb,
+    matchGameDb,
+    participantDb,
+    roundDb,
+    stageDb,
+    tournamentDb,
+} from './db';
+import * as helpers from './helpers';
 import {
     FinalStandingsItem,
     ParticipantSlot,
@@ -17,17 +28,6 @@ import {
     type RoundRobinFinalStandingsItem,
     type RoundRobinFinalStandingsOptions,
 } from './types';
-import { BaseGetter } from './base/getter';
-import * as helpers from './helpers';
-import {
-    tournamentDb,
-    stageDb,
-    groupDb,
-    roundDb,
-    matchDb,
-    matchGameDb,
-    participantDb,
-} from './db';
 
 export class Get extends BaseGetter {
     /**
@@ -176,7 +176,10 @@ export class Get extends BaseGetter {
             if (roundMatches.every((match) => match.status >= Status.Completed))
                 continue;
 
-            const round = await roundDb.getById(this.db, roundMatches[0].round_id);
+            const round = await roundDb.getById(
+                this.db,
+                roundMatches[0].round_id,
+            );
             if (!round) throw Error('Round not found.');
             return round;
         }
@@ -235,7 +238,8 @@ export class Get extends BaseGetter {
                 currentRoundIndex === roundCount - 1
             ) {
                 const [final] = roundMatches;
-                const [consolationFinal] = matchesByRound[currentRoundIndex + 1];
+                const [consolationFinal] =
+                    matchesByRound[currentRoundIndex + 1];
 
                 const finals = [final, consolationFinal];
                 if (finals.every((match) => !helpers.isMatchOngoing(match)))
@@ -248,7 +252,9 @@ export class Get extends BaseGetter {
                 continue;
 
             currentMatches.push(
-                ...roundMatches.filter((match) => helpers.isMatchOngoing(match)),
+                ...roundMatches.filter((match) =>
+                    helpers.isMatchOngoing(match),
+                ),
             );
         }
 
@@ -451,7 +457,9 @@ export class Get extends BaseGetter {
         // Rest: every loser in reverse order.
         const losers = helpers.getLosers(
             participants,
-            matches.filter((match: Match) => match.group_id === singleBracket.id),
+            matches.filter(
+                (match: Match) => match.group_id === singleBracket.id,
+            ),
         );
         grouped.push(...losers.reverse());
 
@@ -547,14 +555,19 @@ export class Get extends BaseGetter {
 
             // 2nd place: Grand Final loser.
             grouped[1] = [
-                helpers.findParticipant(participants, helpers.getLoser(decisiveMatch)),
+                helpers.findParticipant(
+                    participants,
+                    helpers.getLoser(decisiveMatch),
+                ),
             ];
         }
 
         // Rest: every loser in reverse order.
         const losers = helpers.getLosers(
             participants,
-            matches.filter((match: Match) => match.group_id === loserBracket.id),
+            matches.filter(
+                (match: Match) => match.group_id === loserBracket.id,
+            ),
         );
         grouped.push(...losers.reverse());
 

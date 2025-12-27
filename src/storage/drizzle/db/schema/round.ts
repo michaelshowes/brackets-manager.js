@@ -1,8 +1,8 @@
-import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
-import { stage } from './stage';
+import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { group } from './group';
 import { match } from './match';
+import { stage } from './stage';
 
 // A round of a group.
 export const round = pgTable('round', {

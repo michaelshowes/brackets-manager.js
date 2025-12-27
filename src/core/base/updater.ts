@@ -1,21 +1,21 @@
 import {
+    GroupType,
+    Id,
+    IdSeeding,
     Match,
     MatchGame,
     Seeding,
     Stage,
     Status,
-    GroupType,
-    Id,
-    IdSeeding,
 } from '@/model';
-import { DeepPartial, ParticipantSlot, Side } from '../types';
-import { SetNextOpponent } from '../helpers';
-import { ordering } from '../ordering';
-import { StageCreator } from './stage/creator';
-import { BaseGetter } from './getter';
+import { matchDb, matchGameDb, stageDb } from '../db';
 import { Get } from '../get';
 import * as helpers from '../helpers';
-import { stageDb, matchDb, matchGameDb } from '../db';
+import { SetNextOpponent } from '../helpers';
+import { ordering } from '../ordering';
+import { DeepPartial, ParticipantSlot, Side } from '../types';
+import { BaseGetter } from './getter';
+import { StageCreator } from './stage/creator';
 
 export class BaseUpdater extends BaseGetter {
     /**
@@ -50,7 +50,9 @@ export class BaseUpdater extends BaseGetter {
                 ...stage.settings,
                 ...(newSize === 0 ? {} : { size: newSize }), // Just reset the seeding if the new size is going to be empty.
             },
-            ...(seedingIds ? { seedingIds } : { seeding: seeding ?? undefined }),
+            ...(seedingIds
+                ? { seedingIds }
+                : { seeding: seeding ?? undefined }),
         });
 
         creator.setExisting(stageId, false);
@@ -113,7 +115,10 @@ export class BaseUpdater extends BaseGetter {
         if (!games || games.length === 0) throw Error('No match games.');
 
         const parentScores = helpers.getChildGamesResults(games);
-        const parent = helpers.getParentMatchResults(storedParent, parentScores);
+        const parent = helpers.getParentMatchResults(
+            storedParent,
+            parentScores,
+        );
 
         helpers.setParentMatchCompleted(
             parent,
@@ -181,16 +186,23 @@ export class BaseUpdater extends BaseGetter {
         const stage = await stageDb.getById(this.db, match.stage_id);
         if (!stage) throw Error('Stage not found.');
 
-        const group = await (await import('../db')).groupDb.getById(
-            this.db,
-            match.group_id,
-        );
+        const group = await (
+            await import('../db')
+        ).groupDb.getById(this.db, match.group_id);
         if (!group) throw Error('Group not found.');
 
-        const matchLocation = helpers.getMatchLocation(stage.type, group.number);
+        const matchLocation = helpers.getMatchLocation(
+            stage.type,
+            group.number,
+        );
 
         updatePrevious &&
-            (await this.updatePrevious(match, matchLocation, stage, roundNumber));
+            (await this.updatePrevious(
+                match,
+                matchLocation,
+                stage,
+                roundNumber,
+            ));
         updateNext &&
             (await this.updateNext(
                 match,
@@ -232,7 +244,11 @@ export class BaseUpdater extends BaseGetter {
         if (!statusChanged && !resultChanged) return;
 
         if (!helpers.isRoundRobin(stage))
-            await this.updateRelatedMatches(stored, statusChanged, resultChanged);
+            await this.updateRelatedMatches(
+                stored,
+                statusChanged,
+                resultChanged,
+            );
     }
 
     /**
@@ -473,7 +489,9 @@ export class BaseUpdater extends BaseGetter {
         } else if (matchLocation === 'loser_bracket') {
             // Going into consolation final (double elimination)
             const nextSideIntoConsolationFinal =
-                helpers.getNextSideConsolationFinalDoubleElimination(roundNumber);
+                helpers.getNextSideConsolationFinalDoubleElimination(
+                    roundNumber,
+                );
             setNextOpponent(
                 nextMatches[1],
                 nextSideIntoConsolationFinal,

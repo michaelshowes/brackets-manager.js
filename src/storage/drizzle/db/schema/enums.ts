@@ -15,7 +15,10 @@ export const grandFinalTypeEnum = pgEnum('grand_final_type', [
 ]);
 
 // The possible modes for a round-robin stage.
-export const roundRobinModeEnum = pgEnum('round_robin_mode', ['simple', 'double']);
+export const roundRobinModeEnum = pgEnum('round_robin_mode', [
+    'simple',
+    'double',
+]);
 
 // Used to order seeds.
 export const seedOrderingEnum = pgEnum('seed_ordering', [

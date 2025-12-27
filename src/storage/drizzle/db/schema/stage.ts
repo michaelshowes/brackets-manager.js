@@ -1,11 +1,11 @@
-import { integer, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { integer, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
 import { stageTypeEnum } from './enums';
-import { tournament } from './tournament';
 import { group } from './group';
-import { round } from './round';
 import { match } from './match';
 import { matchGame } from './match-game';
+import { round } from './round';
+import { tournament } from './tournament';
 
 // A stage, which can be a round-robin stage or a single/double elimination stage.
 export const stage = pgTable('stage', {

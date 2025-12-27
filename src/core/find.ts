@@ -1,6 +1,6 @@
 import { Group, Id, Match, Round, Stage } from '@/model';
 import type { DrizzleDatabase } from './db';
-import { stageDb, groupDb, roundDb, matchDb } from './db';
+import { groupDb, matchDb, roundDb, stageDb } from './db';
 
 export class Find {
     private readonly db: DrizzleDatabase;
