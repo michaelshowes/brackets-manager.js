@@ -2,13 +2,20 @@
     "name": "@mshowes/brackets-manager",
     "version": "1.8.6",
     "description": "A simple library to manage tournament brackets (based on brackets-manager.js)",
+    "type": "module",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
     "files": [
         "dist"
     ],
     "engines": {
-        "node": ">=14"
+        "node": ">=16"
     },
     "dependencies": {
         "drizzle-orm": "^0.38.4",
@@ -16,32 +23,20 @@
         "uuid": "^9.0.0"
     },
     "devDependencies": {
-        "@types/chai": "^4.3.3",
-        "@types/mocha": "^9.1.1",
         "@types/node": "18.11.9",
         "@types/uuid": "^9.0.2",
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",
-        "brackets-json-db": "1.0.2",
-        "brackets-memory-db": "^1.0.4",
-        "chai": "^4.3.6",
-        "chai-as-promised": "^7.1.1",
         "eslint": "^8.26.0",
         "eslint-plugin-jsdoc": "^39.6.2",
-        "json-server": "^0.17.1",
-        "mocha": "10.1.0",
-        "mocha-each": "^2.0.1",
-        "nyc": "^15.1.0",
-        "typescript": "^4.8.4"
+        "tsc-alias": "^1.8.16",
+        "typescript": "^5.7.2"
     },
     "scripts": {
         "lint": "eslint '**/*.{js,ts}' --fix",
-        "test": "mocha 'test/**/*.spec.js'",
-        "db": "json-server --watch db.json",
         "start": "tsc --watch",
-        "build": "tsc",
+        "build": "tsc && tsc-alias",
         "prepare": "npm run build",
-        "prepublishOnly": "npm run build",
-        "coverage": "nyc -r text -r lcov npm test"
+        "prepublishOnly": "npm run build"
     }
 }
