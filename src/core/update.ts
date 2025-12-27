@@ -12,6 +12,7 @@ import { ordering } from './ordering';
 import { BaseUpdater } from './base/updater';
 import { ChildCountLevel, DeepPartial } from './types';
 import * as helpers from './helpers';
+import { stageDb, groupDb, roundDb, matchDb, matchGameDb } from './db';
 
 export class Update extends BaseUpdater {
     /**
@@ -26,7 +27,7 @@ export class Update extends BaseUpdater {
     ): Promise<void> {
         if (match.id === undefined) throw Error('No match id given.');
 
-        const stored = await this.storage.select('match', match.id);
+        const stored = await matchDb.getById(this.db, match.id);
         if (!stored) throw Error('Match not found.');
 
         await this.updateMatch(stored, match);
@@ -57,7 +58,7 @@ export class Update extends BaseUpdater {
         stageId: Id,
         seedOrdering: SeedOrdering[],
     ): Promise<void> {
-        const stage = await this.storage.select('stage', stageId);
+        const stage = await stageDb.getById(this.db, stageId);
         if (!stage) throw Error('Stage not found.');
 
         helpers.ensureNotRoundRobin(stage);
@@ -80,10 +81,10 @@ export class Update extends BaseUpdater {
         roundId: Id,
         method: SeedOrdering,
     ): Promise<void> {
-        const round = await this.storage.select('round', roundId);
+        const round = await roundDb.getById(this.db, roundId);
         if (!round) throw Error('This round does not exist.');
 
-        const stage = await this.storage.select('stage', round.stage_id);
+        const stage = await stageDb.getById(this.db, round.stage_id);
         if (!stage) throw Error('Stage not found.');
 
         helpers.ensureNotRoundRobin(stage);
@@ -114,7 +115,7 @@ export class Update extends BaseUpdater {
                 await this.updateRoundMatchChildCount(id, childCount);
                 break;
             case 'match':
-                const match = await this.storage.select('match', id);
+                const match = await matchDb.getById(this.db, id);
                 if (!match) throw Error('Match not found.');
                 await this.adjustMatchChildGames(match, childCount);
                 break;
@@ -174,20 +175,19 @@ export class Update extends BaseUpdater {
         round: Round,
         method: SeedOrdering,
     ): Promise<void> {
-        const matches = await this.storage.select('match', {
-            round_id: round.id,
-        });
-        if (!matches) throw Error('This round has no match.');
+        const matches = await matchDb.getByRound(this.db, round.id);
+        if (!matches || matches.length === 0)
+            throw Error('This round has no match.');
 
         if (matches.some((match) => match.status > Status.Ready))
             throw Error('At least one match has started or is completed.');
 
-        const stage = await this.storage.select('stage', round.stage_id);
+        const stage = await stageDb.getById(this.db, round.stage_id);
         if (!stage) throw Error('Stage not found.');
         if (stage.settings.size === undefined)
             throw Error('Undefined stage size.');
 
-        const group = await this.storage.select('group', round.group_id);
+        const group = await groupDb.getById(this.db, round.group_id);
         if (!group) throw Error('Group not found.');
 
         const inLoserBracket = helpers.isLoserBracket(stage.type, group.number);
@@ -215,19 +215,15 @@ export class Update extends BaseUpdater {
         stageId: Id,
         childCount: number,
     ): Promise<void> {
-        if (
-            !(await this.storage.update(
-                'match',
-                { stage_id: stageId },
-                { child_count: childCount },
-            ))
-        )
-            throw Error('Could not update the match.');
+        await matchDb.updateByFilter(
+            this.db,
+            { stage_id: stageId },
+            { child_count: childCount },
+        );
 
-        const matches = await this.storage.select('match', {
-            stage_id: stageId,
-        });
-        if (!matches) throw Error('This stage has no match.');
+        const matches = await matchDb.getByStage(this.db, stageId);
+        if (!matches || matches.length === 0)
+            throw Error('This stage has no match.');
 
         for (const match of matches)
             await this.adjustMatchChildGames(match, childCount);
@@ -243,19 +239,15 @@ export class Update extends BaseUpdater {
         groupId: Id,
         childCount: number,
     ): Promise<void> {
-        if (
-            !(await this.storage.update(
-                'match',
-                { group_id: groupId },
-                { child_count: childCount },
-            ))
-        )
-            throw Error('Could not update the match.');
+        await matchDb.updateByFilter(
+            this.db,
+            { group_id: groupId },
+            { child_count: childCount },
+        );
 
-        const matches = await this.storage.select('match', {
-            group_id: groupId,
-        });
-        if (!matches) throw Error('This group has no match.');
+        const matches = await matchDb.getByGroup(this.db, groupId);
+        if (!matches || matches.length === 0)
+            throw Error('This group has no match.');
 
         for (const match of matches)
             await this.adjustMatchChildGames(match, childCount);
@@ -271,19 +263,15 @@ export class Update extends BaseUpdater {
         roundId: Id,
         childCount: number,
     ): Promise<void> {
-        if (
-            !(await this.storage.update(
-                'match',
-                { round_id: roundId },
-                { child_count: childCount },
-            ))
-        )
-            throw Error('Could not update the match.');
+        await matchDb.updateByFilter(
+            this.db,
+            { round_id: roundId },
+            { child_count: childCount },
+        );
 
-        const matches = await this.storage.select('match', {
-            round_id: roundId,
-        });
-        if (!matches) throw Error('This round has no match.');
+        const matches = await matchDb.getByRound(this.db, roundId);
+        if (!matches || matches.length === 0)
+            throw Error('This round has no match.');
 
         for (const match of matches)
             await this.adjustMatchChildGames(match, childCount);
@@ -303,10 +291,7 @@ export class Update extends BaseUpdater {
     ): Promise<void> {
         for (const match of matches) {
             const updated = { ...match };
-            updated.opponent1 = helpers.findPosition(
-                matches,
-                positions.shift()!,
-            );
+            updated.opponent1 = helpers.findPosition(matches, positions.shift()!);
 
             // The only rounds where we have a second ordered participant are first rounds of brackets (upper and lower).
             if (roundNumber === 1) {
@@ -316,8 +301,7 @@ export class Update extends BaseUpdater {
                 );
             }
 
-            if (!(await this.storage.update('match', updated.id, updated)))
-                throw Error('Could not update the match.');
+            await matchDb.update(this.db, updated.id, updated);
         }
     }
 
@@ -331,45 +315,37 @@ export class Update extends BaseUpdater {
         match: Match,
         targetChildCount: number,
     ): Promise<void> {
-        const games = await this.storage.select('match_game', {
-            parent_id: match.id,
-        });
+        const games = await matchGameDb.getByParent(this.db, match.id);
         let childCount = games ? games.length : 0;
 
+        const { v4: uuidv4 } = await import('uuid');
+
         while (childCount < targetChildCount) {
-            const id = await this.storage.insert('match_game', {
+            await matchGameDb.insert(this.db, {
+                id: uuidv4(),
                 number: childCount + 1,
-                stage_id: match.stage_id,
-                parent_id: match.id,
+                stage_id: String(match.stage_id),
+                parent_id: String(match.id),
                 status: match.status,
                 opponent1: { id: null },
                 opponent2: { id: null },
             });
 
-            if (id === -1)
-                throw Error('Could not adjust the match games when inserting.');
-
             childCount++;
         }
 
         while (childCount > targetChildCount) {
-            const deleted = await this.storage.delete('match_game', {
+            await matchGameDb.delete(this.db, {
                 parent_id: match.id,
                 number: childCount,
             });
 
-            if (!deleted)
-                throw Error('Could not adjust the match games when deleting.');
-
             childCount--;
         }
 
-        if (
-            !(await this.storage.update('match', match.id, {
-                ...match,
-                child_count: targetChildCount,
-            }))
-        )
-            throw Error('Could not update the match.');
+        await matchDb.update(this.db, match.id, {
+            ...match,
+            child_count: targetChildCount,
+        });
     }
 }

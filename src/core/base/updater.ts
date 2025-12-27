@@ -1,4 +1,13 @@
-import { Match, MatchGame, Seeding, Stage, Status, GroupType, Id, IdSeeding } from '@/model';
+import {
+    Match,
+    MatchGame,
+    Seeding,
+    Stage,
+    Status,
+    GroupType,
+    Id,
+    IdSeeding,
+} from '@/model';
 import { DeepPartial, ParticipantSlot, Side } from '../types';
 import { SetNextOpponent } from '../helpers';
 import { ordering } from '../ordering';
@@ -6,9 +15,9 @@ import { StageCreator } from './stage/creator';
 import { BaseGetter } from './getter';
 import { Get } from '../get';
 import * as helpers from '../helpers';
+import { stageDb, matchDb, matchGameDb } from '../db';
 
 export class BaseUpdater extends BaseGetter {
-
     /**
      * Updates or resets the seeding of a stage.
      *
@@ -18,13 +27,22 @@ export class BaseUpdater extends BaseGetter {
      * @param seeding.seedingIds Can only contain IDs or BYEs.
      * @param keepSameSize Whether to keep the same size as before for the stage.
      */
-    protected async updateSeeding(stageId: Id, { seeding, seedingIds }: { seeding?: Seeding | null, seedingIds?: IdSeeding | null }, keepSameSize: boolean): Promise<void> {
-        const stage = await this.storage.select('stage', stageId);
+    protected async updateSeeding(
+        stageId: Id,
+        {
+            seeding,
+            seedingIds,
+        }: { seeding?: Seeding | null; seedingIds?: IdSeeding | null },
+        keepSameSize: boolean,
+    ): Promise<void> {
+        const stage = await stageDb.getById(this.db, stageId);
         if (!stage) throw Error('Stage not found.');
 
-        const newSize = keepSameSize ? stage.settings.size : (seedingIds || seeding)?.length ?? 0;
+        const newSize = keepSameSize
+            ? stage.settings.size
+            : (seedingIds || seeding)?.length ?? 0;
 
-        const creator = new StageCreator(this.storage, {
+        const creator = new StageCreator(this.db, {
             name: stage.name,
             tournamentId: stage.tournament_id,
             type: stage.type,
@@ -32,7 +50,7 @@ export class BaseUpdater extends BaseGetter {
                 ...stage.settings,
                 ...(newSize === 0 ? {} : { size: newSize }), // Just reset the seeding if the new size is going to be empty.
             },
-            ...((seedingIds ? { seedingIds } : { seeding: seeding ?? undefined })),
+            ...(seedingIds ? { seedingIds } : { seeding: seeding ?? undefined }),
         });
 
         creator.setExisting(stageId, false);
@@ -56,14 +74,16 @@ export class BaseUpdater extends BaseGetter {
      * @param stageId ID of the stage.
      */
     protected async confirmCurrentSeeding(stageId: Id): Promise<void> {
-        const stage = await this.storage.select('stage', stageId);
+        const stage = await stageDb.getById(this.db, stageId);
         if (!stage) throw Error('Stage not found.');
 
-        const get = new Get(this.storage);
+        const get = new Get(this.db);
         const currentSeeding = await get.seeding(stageId);
-        const newSeeding = helpers.convertSlotsToSeeding(currentSeeding.map(helpers.convertTBDtoBYE));
+        const newSeeding = helpers.convertSlotsToSeeding(
+            currentSeeding.map(helpers.convertTBDtoBYE),
+        );
 
-        const creator = new StageCreator(this.storage, {
+        const creator = new StageCreator(this.db, {
             name: stage.name,
             tournamentId: stage.tournament_id,
             type: stage.type,
@@ -78,21 +98,28 @@ export class BaseUpdater extends BaseGetter {
 
     /**
      * Updates a parent match based on its child games.
-     * 
+     *
      * @param parentId ID of the parent match.
      * @param inRoundRobin Indicates whether the parent match is in a round-robin stage.
      */
-    protected async updateParentMatch(parentId: Id, inRoundRobin: boolean): Promise<void> {
-        const storedParent = await this.storage.select('match', parentId);
+    protected async updateParentMatch(
+        parentId: Id,
+        inRoundRobin: boolean,
+    ): Promise<void> {
+        const storedParent = await matchDb.getById(this.db, parentId);
         if (!storedParent) throw Error('Parent not found.');
 
-        const games = await this.storage.select('match_game', { parent_id: parentId });
-        if (!games) throw Error('No match games.');
+        const games = await matchGameDb.getByParent(this.db, parentId);
+        if (!games || games.length === 0) throw Error('No match games.');
 
         const parentScores = helpers.getChildGamesResults(games);
         const parent = helpers.getParentMatchResults(storedParent, parentScores);
 
-        helpers.setParentMatchCompleted(parent, storedParent.child_count, inRoundRobin);
+        helpers.setParentMatchCompleted(
+            parent,
+            storedParent.child_count,
+            inRoundRobin,
+        );
 
         await this.updateMatch(storedParent, parent, true);
     }
@@ -103,20 +130,29 @@ export class BaseUpdater extends BaseGetter {
      * @param matches The matches stored in the database.
      * @param slots The slots to check from the new seeding.
      */
-    protected static assertCanUpdateSeeding(matches: Match[], slots: ParticipantSlot[]): void {
+    protected static assertCanUpdateSeeding(
+        matches: Match[],
+        slots: ParticipantSlot[],
+    ): void {
         let index = 0;
 
         for (const match of matches) {
             // Changing the seeding would reset the matches of round >= 2, leaving the scores behind, with no participants.
             if (match.status === Status.Archived)
-                throw Error('A match of round 1 is archived, which means round 2 was started.');
+                throw Error(
+                    'A match of round 1 is archived, which means round 2 was started.',
+                );
 
             const opponent1 = slots[index++];
             const opponent2 = slots[index++];
             const isParticipantLocked = helpers.isMatchParticipantLocked(match);
 
             // The match is participant locked, and the participants would have to change.
-            if (isParticipantLocked && (match.opponent1?.id !== opponent1?.id || match.opponent2?.id !== opponent2?.id))
+            if (
+                isParticipantLocked &&
+                (match.opponent1?.id !== opponent1?.id ||
+                    match.opponent2?.id !== opponent2?.id)
+            )
                 throw Error('A match is locked.');
         }
     }
@@ -128,44 +164,68 @@ export class BaseUpdater extends BaseGetter {
      * @param updatePrevious Whether to update the previous matches.
      * @param updateNext Whether to update the next matches.
      */
-    protected async updateRelatedMatches(match: Match, updatePrevious: boolean, updateNext: boolean): Promise<void> {
+    protected async updateRelatedMatches(
+        match: Match,
+        updatePrevious: boolean,
+        updateNext: boolean,
+    ): Promise<void> {
         // This is a consolation match (doesn't have a `group_id`, nor a `round_id`).
-        // It doesn't have any related matches from the POV of the library, because the 
+        // It doesn't have any related matches from the POV of the library, because the
         // creation of consolation matches is handled by the user.
-        if (match.round_id === undefined)
-            return;
+        if (match.round_id === undefined) return;
 
-        const { roundNumber, roundCount } = await this.getRoundPositionalInfo(match.round_id);
+        const { roundNumber, roundCount } = await this.getRoundPositionalInfo(
+            match.round_id,
+        );
 
-        const stage = await this.storage.select('stage', match.stage_id);
+        const stage = await stageDb.getById(this.db, match.stage_id);
         if (!stage) throw Error('Stage not found.');
 
-        const group = await this.storage.select('group', match.group_id);
+        const group = await (await import('../db')).groupDb.getById(
+            this.db,
+            match.group_id,
+        );
         if (!group) throw Error('Group not found.');
 
         const matchLocation = helpers.getMatchLocation(stage.type, group.number);
 
-        updatePrevious && await this.updatePrevious(match, matchLocation, stage, roundNumber);
-        updateNext && await this.updateNext(match, matchLocation, stage, roundNumber, roundCount);
+        updatePrevious &&
+            (await this.updatePrevious(match, matchLocation, stage, roundNumber));
+        updateNext &&
+            (await this.updateNext(
+                match,
+                matchLocation,
+                stage,
+                roundNumber,
+                roundCount,
+            ));
     }
 
     /**
      * Updates a match based on a partial match.
-     * 
+     *
      * @param stored A reference to what will be updated in the storage.
      * @param match Input of the update.
      * @param force Whether to force update locked matches.
      */
-    protected async updateMatch(stored: Match, match: DeepPartial<Match>, force?: boolean): Promise<void> {
+    protected async updateMatch(
+        stored: Match,
+        match: DeepPartial<Match>,
+        force?: boolean,
+    ): Promise<void> {
         if (!force && helpers.isMatchUpdateLocked(stored))
             throw Error('The match is locked.');
 
-        const stage = await this.storage.select('stage', stored.stage_id);
+        const stage = await stageDb.getById(this.db, stored.stage_id);
         if (!stage) throw Error('Stage not found.');
 
         const inRoundRobin = helpers.isRoundRobin(stage);
 
-        const { statusChanged, resultChanged } = helpers.setMatchResults(stored, match, inRoundRobin);
+        const { statusChanged, resultChanged } = helpers.setMatchResults(
+            stored,
+            match,
+            inRoundRobin,
+        );
         await this.applyMatchUpdate(stored);
 
         // Don't update related matches if it's a simple score update.
@@ -177,23 +237,25 @@ export class BaseUpdater extends BaseGetter {
 
     /**
      * Updates a match game based on a partial match game.
-     * 
+     *
      * @param stored A reference to what will be updated in the storage.
      * @param game Input of the update.
      */
-    protected async updateMatchGame(stored: MatchGame, game: DeepPartial<MatchGame>): Promise<void> {
+    protected async updateMatchGame(
+        stored: MatchGame,
+        game: DeepPartial<MatchGame>,
+    ): Promise<void> {
         if (helpers.isMatchUpdateLocked(stored))
             throw Error('The match game is locked.');
 
-        const stage = await this.storage.select('stage', stored.stage_id);
+        const stage = await stageDb.getById(this.db, stored.stage_id);
         if (!stage) throw Error('Stage not found.');
 
         const inRoundRobin = helpers.isRoundRobin(stage);
 
         helpers.setMatchResults(stored, game, inRoundRobin);
 
-        if (!await this.storage.update('match_game', stored.id, stored))
-            throw Error('Could not update the match game.');
+        await matchGameDb.update(this.db, stored.id, stored);
 
         await this.updateParentMatch(stored.parent_id, inRoundRobin);
     }
@@ -204,8 +266,7 @@ export class BaseUpdater extends BaseGetter {
      * @param match A match.
      */
     protected async applyMatchUpdate(match: Match): Promise<void> {
-        if (!await this.storage.update('match', match.id, match))
-            throw Error('Could not update the match.');
+        await matchDb.update(this.db, match.id, match);
 
         if (match.child_count === 0) return;
 
@@ -219,8 +280,11 @@ export class BaseUpdater extends BaseGetter {
         if (match.status <= Status.Ready || match.status === Status.Archived)
             updatedMatchGame.status = match.status;
 
-        if (!await this.storage.update('match_game', { parent_id: match.id }, updatedMatchGame))
-            throw Error('Could not update the match game.');
+        await matchGameDb.updateByFilter(
+            this.db,
+            { parent_id: match.id },
+            updatedMatchGame,
+        );
     }
 
     /**
@@ -231,14 +295,23 @@ export class BaseUpdater extends BaseGetter {
      * @param stage The parent stage.
      * @param roundNumber Number of the round.
      */
-    protected async updatePrevious(match: Match, matchLocation: GroupType, stage: Stage, roundNumber: number): Promise<void> {
-        const previousMatches = await this.getPreviousMatches(match, matchLocation, stage, roundNumber);
+    protected async updatePrevious(
+        match: Match,
+        matchLocation: GroupType,
+        stage: Stage,
+        roundNumber: number,
+    ): Promise<void> {
+        const previousMatches = await this.getPreviousMatches(
+            match,
+            matchLocation,
+            stage,
+            roundNumber,
+        );
         if (previousMatches.length === 0) return;
 
         if (match.status >= Status.Running)
             await this.archiveMatches(previousMatches);
-        else
-            await this.resetMatchesStatus(previousMatches);
+        else await this.resetMatchesStatus(previousMatches);
     }
 
     /**
@@ -248,8 +321,7 @@ export class BaseUpdater extends BaseGetter {
      */
     protected async archiveMatches(matches: Match[]): Promise<void> {
         for (const match of matches) {
-            if (match.status === Status.Archived)
-                continue;
+            if (match.status === Status.Archived) continue;
 
             match.status = Status.Archived;
             await this.applyMatchUpdate(match);
@@ -277,8 +349,20 @@ export class BaseUpdater extends BaseGetter {
      * @param roundNumber Number of the round.
      * @param roundCount Count of rounds.
      */
-    protected async updateNext(match: Match, matchLocation: GroupType, stage: Stage, roundNumber: number, roundCount: number): Promise<void> {
-        const nextMatches = await this.getNextMatches(match, matchLocation, stage, roundNumber, roundCount);
+    protected async updateNext(
+        match: Match,
+        matchLocation: GroupType,
+        stage: Stage,
+        roundNumber: number,
+        roundCount: number,
+    ): Promise<void> {
+        const nextMatches = await this.getNextMatches(
+            match,
+            matchLocation,
+            stage,
+            roundNumber,
+            roundCount,
+        );
         if (nextMatches.length === 0) {
             // Archive match if it doesn't have following matches and is completed.
             // When the stage is fully complete, all matches should be archived.
@@ -289,20 +373,38 @@ export class BaseUpdater extends BaseGetter {
         }
 
         const winnerSide = helpers.getMatchResult(match);
-        const actualRoundNumber = (stage.settings.skipFirstRound && matchLocation === 'winner_bracket') ? roundNumber + 1 : roundNumber;
+        const actualRoundNumber =
+            stage.settings.skipFirstRound && matchLocation === 'winner_bracket'
+                ? roundNumber + 1
+                : roundNumber;
 
         if (winnerSide)
-            await this.applyToNextMatches(helpers.setNextOpponent, match, matchLocation, actualRoundNumber, roundCount, nextMatches, winnerSide);
+            await this.applyToNextMatches(
+                helpers.setNextOpponent,
+                match,
+                matchLocation,
+                actualRoundNumber,
+                roundCount,
+                nextMatches,
+                winnerSide,
+            );
         else
-            await this.applyToNextMatches(helpers.resetNextOpponent, match, matchLocation, actualRoundNumber, roundCount, nextMatches);
+            await this.applyToNextMatches(
+                helpers.resetNextOpponent,
+                match,
+                matchLocation,
+                actualRoundNumber,
+                roundCount,
+                nextMatches,
+            );
     }
 
     /**
      * Applies a `SetNextOpponent` function to matches following the current match.
-     * 
+     *
      * - `nextMatches[0]` is assumed to be next match for the winner of the current match.
      * - `nextMatches[1]` is assumed to be next match for the loser of the current match.
-     * 
+     *
      * @param setNextOpponent The `SetNextOpponent` function.
      * @param match The current match.
      * @param matchLocation Location of the current match.
@@ -311,7 +413,15 @@ export class BaseUpdater extends BaseGetter {
      * @param nextMatches The matches following the current match.
      * @param winnerSide Side of the winner in the current match.
      */
-    protected async applyToNextMatches(setNextOpponent: SetNextOpponent, match: Match, matchLocation: GroupType, roundNumber: number, roundCount: number, nextMatches: (Match | null)[], winnerSide?: Side): Promise<void> {
+    protected async applyToNextMatches(
+        setNextOpponent: SetNextOpponent,
+        match: Match,
+        matchLocation: GroupType,
+        roundNumber: number,
+        roundCount: number,
+        nextMatches: (Match | null)[],
+        winnerSide?: Side,
+    ): Promise<void> {
         if (matchLocation === 'final_group') {
             if (!nextMatches[0]) throw Error('First next match is null.');
             setNextOpponent(nextMatches[0], 'opponent1', match, 'opponent1');
@@ -320,7 +430,12 @@ export class BaseUpdater extends BaseGetter {
             return;
         }
 
-        const nextSide = helpers.getNextSide(match.number, roundNumber, roundCount, matchLocation);
+        const nextSide = helpers.getNextSide(
+            match.number,
+            roundNumber,
+            roundCount,
+            matchLocation,
+        );
 
         // First next match
         if (nextMatches[0]) {
@@ -334,24 +449,44 @@ export class BaseUpdater extends BaseGetter {
         // Second next match
         if (matchLocation === 'single_bracket') {
             // Going into consolation final (single elimination)
-            setNextOpponent(nextMatches[1], nextSide, match, winnerSide && helpers.getOtherSide(winnerSide));
+            setNextOpponent(
+                nextMatches[1],
+                nextSide,
+                match,
+                winnerSide && helpers.getOtherSide(winnerSide),
+            );
             await this.applyMatchUpdate(nextMatches[1]);
         } else if (matchLocation === 'winner_bracket') {
             // Going into loser bracket match (double elimination)
-            const nextSideIntoLB = helpers.getNextSideLoserBracket(match.number, nextMatches[1], roundNumber);
-            setNextOpponent(nextMatches[1], nextSideIntoLB, match, winnerSide && helpers.getOtherSide(winnerSide));
+            const nextSideIntoLB = helpers.getNextSideLoserBracket(
+                match.number,
+                nextMatches[1],
+                roundNumber,
+            );
+            setNextOpponent(
+                nextMatches[1],
+                nextSideIntoLB,
+                match,
+                winnerSide && helpers.getOtherSide(winnerSide),
+            );
             await this.propagateByeWinners(nextMatches[1]);
         } else if (matchLocation === 'loser_bracket') {
             // Going into consolation final (double elimination)
-            const nextSideIntoConsolationFinal = helpers.getNextSideConsolationFinalDoubleElimination(roundNumber);
-            setNextOpponent(nextMatches[1], nextSideIntoConsolationFinal, match, winnerSide && helpers.getOtherSide(winnerSide));
+            const nextSideIntoConsolationFinal =
+                helpers.getNextSideConsolationFinalDoubleElimination(roundNumber);
+            setNextOpponent(
+                nextMatches[1],
+                nextSideIntoConsolationFinal,
+                match,
+                winnerSide && helpers.getOtherSide(winnerSide),
+            );
             await this.propagateByeWinners(nextMatches[1]);
         }
     }
 
     /**
      * Propagates winner against BYEs in related matches.
-     * 
+     *
      * @param match The current match.
      */
     protected async propagateByeWinners(match: Match): Promise<void> {

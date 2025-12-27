@@ -1,16 +1,25 @@
 import { Id } from '@/model';
-import { Storage } from './types';
+import type { DrizzleDatabase } from './db';
+import {
+    tournamentDb,
+    stageDb,
+    groupDb,
+    roundDb,
+    matchDb,
+    matchGameDb,
+    participantDb,
+} from './db';
 
 export class Delete {
-    private readonly storage: Storage;
+    private readonly db: DrizzleDatabase;
 
     /**
      * Creates an instance of Delete, which will handle cleanly deleting data in the storage.
      *
-     * @param storage The implementation of Storage.
+     * @param db The Drizzle database instance.
      */
-    constructor(storage: Storage) {
-        this.storage = storage;
+    constructor(db: DrizzleDatabase) {
+        this.db = db;
     }
 
     /**
@@ -27,16 +36,10 @@ export class Delete {
         await this.tournamentStages(tournamentId);
 
         // Delete participants
-        if (
-            !(await this.storage.delete('participant', {
-                tournament_id: tournamentId,
-            }))
-        )
-            throw Error('Could not delete participants.');
+        await participantDb.delete(this.db, { tournament_id: tournamentId });
 
         // Finally, delete the tournament itself
-        if (!(await this.storage.delete('tournament', { id: tournamentId })))
-            throw Error('Could not delete the tournament.');
+        await tournamentDb.delete(this.db, tournamentId);
     }
 
     /**
@@ -47,9 +50,7 @@ export class Delete {
      * @param tournamentId ID of the tournament.
      */
     public async tournamentStages(tournamentId: Id): Promise<void> {
-        const stages = await this.storage.select('stage', {
-            tournament_id: tournamentId,
-        });
+        const stages = await stageDb.getByTournament(this.db, tournamentId);
         if (!stages) throw Error('Error getting the stages.');
 
         // Not doing this in a `Promise.all()` since this can be a heavy operation.
@@ -71,19 +72,10 @@ export class Delete {
     public async stage(stageId: Id): Promise<void> {
         // The order is important here, because the abstract storage can possibly have foreign key checks (e.g. SQL).
 
-        if (!(await this.storage.delete('match_game', { stage_id: stageId })))
-            throw Error('Could not delete match games.');
-
-        if (!(await this.storage.delete('match', { stage_id: stageId })))
-            throw Error('Could not delete matches.');
-
-        if (!(await this.storage.delete('round', { stage_id: stageId })))
-            throw Error('Could not delete rounds.');
-
-        if (!(await this.storage.delete('group', { stage_id: stageId })))
-            throw Error('Could not delete groups.');
-
-        if (!(await this.storage.delete('stage', { id: stageId })))
-            throw Error('Could not delete the stage.');
+        await matchGameDb.delete(this.db, { stage_id: stageId });
+        await matchDb.delete(this.db, { stage_id: stageId });
+        await roundDb.delete(this.db, { stage_id: stageId });
+        await groupDb.delete(this.db, { stage_id: stageId });
+        await stageDb.delete(this.db, { id: stageId });
     }
 }
