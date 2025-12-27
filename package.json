@@ -19,11 +19,12 @@
     },
     "dependencies": {
         "drizzle-orm": "^0.38.4",
-        "postgres": "^3.4.7",
+        "pg": "^8.13.1",
         "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@types/node": "18.11.9",
+        "@types/pg": "^8.11.10",
         "@types/uuid": "^9.0.2",
         "@typescript-eslint/eslint-plugin": "^5.42.0",
         "@typescript-eslint/parser": "^5.42.0",

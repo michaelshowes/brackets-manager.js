@@ -1,18 +1,20 @@
-import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { Pool, type PoolConfig } from 'pg';
 import * as schema from './schema';
 
-export type DrizzleDatabase = PostgresJsDatabase<typeof schema>;
+export type DrizzleDatabase = NodePgDatabase<typeof schema>;
 
 /**
- * Creates a Drizzle database instance connected to PostgreSQL.
+ * Creates a Drizzle database instance connected to PostgreSQL using node-postgres (pg).
  *
- * @param connectionString - PostgreSQL connection string
+ * @param config - PostgreSQL connection string or PoolConfig object
  * @returns Drizzle database instance with schema
  */
-export function createDatabase(connectionString: string): DrizzleDatabase {
-    const client = postgres(connectionString);
-    return drizzle(client, { schema });
+export function createDatabase(config: string | PoolConfig): DrizzleDatabase {
+    const pool = new Pool(
+        typeof config === 'string' ? { connectionString: config } : config,
+    );
+    return drizzle(pool, { schema });
 }
 
 export { schema };
