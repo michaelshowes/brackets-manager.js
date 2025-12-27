@@ -7,15 +7,15 @@ import {
     Seeding,
     Stage,
     Status,
-} from '@/model';
-import { matchDb, matchGameDb, stageDb } from '../db';
-import { Get } from '../get';
-import * as helpers from '../helpers';
-import { SetNextOpponent } from '../helpers';
-import { ordering } from '../ordering';
-import { DeepPartial, ParticipantSlot, Side } from '../types';
-import { BaseGetter } from './getter';
-import { StageCreator } from './stage/creator';
+} from '@/model/index.js';
+import { matchDb, matchGameDb, stageDb } from '../db.js';
+import { Get } from '../get.js';
+import * as helpers from '../helpers.js';
+import { SetNextOpponent } from '../helpers.js';
+import { ordering } from '../ordering.js';
+import { DeepPartial, ParticipantSlot, Side } from '../types.js';
+import { BaseGetter } from './getter.js';
+import { StageCreator } from './stage/creator.js';
 
 export class BaseUpdater extends BaseGetter {
     /**
@@ -187,7 +187,7 @@ export class BaseUpdater extends BaseGetter {
         if (!stage) throw Error('Stage not found.');
 
         const group = await (
-            await import('../db')
+            await import('../db.js')
         ).groupDb.getById(this.db, match.group_id);
         if (!group) throw Error('Group not found.');
 

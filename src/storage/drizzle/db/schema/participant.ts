@@ -1,6 +1,6 @@
 import { relations } from 'drizzle-orm';
 import { pgTable, text } from 'drizzle-orm/pg-core';
-import { tournament } from './tournament';
+import { tournament } from './tournament.js';
 
 // A participant of a stage (team or individual).
 export const participant = pgTable('participant', {

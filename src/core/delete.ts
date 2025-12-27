@@ -1,5 +1,5 @@
-import { Id } from '@/model';
-import type { DrizzleDatabase } from './db';
+import { Id } from '@/model/index.js';
+import type { DrizzleDatabase } from './db.js';
 import {
     groupDb,
     matchDb,
@@ -8,7 +8,7 @@ import {
     roundDb,
     stageDb,
     tournamentDb,
-} from './db';
+} from './db.js';
 
 export class Delete {
     private readonly db: DrizzleDatabase;

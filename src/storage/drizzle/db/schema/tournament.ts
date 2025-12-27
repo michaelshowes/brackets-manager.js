@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { jsonb, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
-import { participant } from './participant';
-import { stage } from './stage';
+import { participant } from './participant.js';
+import { stage } from './stage.js';
 
 // A tournament that can contain multiple stages and participants.
 export const tournament = pgTable('tournament', {

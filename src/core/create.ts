@@ -1,6 +1,6 @@
-import { InputStage, Stage } from '@/model';
-import { create } from './base/stage/creator';
-import type { DrizzleDatabase } from './db';
+import { InputStage, Stage } from '@/model/index.js';
+import { create } from './base/stage/creator.js';
+import type { DrizzleDatabase } from './db.js';
 
 export async function createStage(
     db: DrizzleDatabase,

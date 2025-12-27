@@ -8,8 +8,8 @@ import {
     Round,
     Stage,
     Status,
-} from '@/model';
-import { BaseGetter } from './base/getter';
+} from '@/model/index.js';
+import { BaseGetter } from './base/getter.js';
 import {
     groupDb,
     matchDb,
@@ -18,8 +18,8 @@ import {
     roundDb,
     stageDb,
     tournamentDb,
-} from './db';
-import * as helpers from './helpers';
+} from './db.js';
+import * as helpers from './helpers.js';
 import {
     FinalStandingsItem,
     ParticipantSlot,
@@ -27,7 +27,7 @@ import {
     Tournament,
     type RoundRobinFinalStandingsItem,
     type RoundRobinFinalStandingsOptions,
-} from './types';
+} from './types.js';
 
 export class Get extends BaseGetter {
     /**

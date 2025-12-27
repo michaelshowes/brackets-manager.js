@@ -2,7 +2,7 @@
  * Contains the rest of the types which doesn't belong to the other files.
  *--------------------------------------------------------------------------*/
 
-import { Id, Result } from './unions';
+import { Id, Result } from './unions.js';
 
 /**
  * The possible status for a match.

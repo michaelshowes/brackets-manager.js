@@ -11,8 +11,8 @@ import type {
     Participant,
     Round,
     Stage,
-} from '@/model';
-import type { DrizzleDatabase } from '@/storage/drizzle/db';
+} from '@/model/index.js';
+import type { DrizzleDatabase } from '@/storage/drizzle/db/index.js';
 import {
     group,
     match,
@@ -21,12 +21,12 @@ import {
     round,
     stage,
     tournament,
-} from '@/storage/drizzle/db/schema';
+} from '@/storage/drizzle/db/schema/index.js';
 import { and, asc, desc, eq } from 'drizzle-orm';
-import type { Tournament } from './types';
+import type { Tournament } from './types.js';
 
 // Re-export the database type for convenience
-export type { DrizzleDatabase } from '@/storage/drizzle/db';
+export type { DrizzleDatabase } from '@/storage/drizzle/db/index.js';
 
 // Helper to convert Id to string for database queries
 const toStr = (id: Id): string => String(id);

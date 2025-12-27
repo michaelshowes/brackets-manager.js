@@ -1,5 +1,5 @@
 // Core exports
-export { BracketsManager } from '@/core/manager';
+export { BracketsManager } from '@/core/manager.js';
 
 export {
     ChildCountLevel,
@@ -26,17 +26,17 @@ export {
     Table,
     Tournament,
     ValueToArray,
-} from '@/core/types';
+} from '@/core/types.js';
 
-export * as helpers from '@/core/helpers';
-export { ordering } from '@/core/ordering';
+export * as helpers from '@/core/helpers.js';
+export { ordering } from '@/core/ordering.js';
 
-export { StageCreator } from '@/core/base/stage/creator';
-export { Delete } from '@/core/delete';
-export { Find } from '@/core/find';
-export { Get } from '@/core/get';
-export { Reset } from '@/core/reset';
-export { Update } from '@/core/update';
+export { StageCreator } from '@/core/base/stage/creator.js';
+export { Delete } from '@/core/delete.js';
+export { Find } from '@/core/find.js';
+export { Get } from '@/core/get.js';
+export { Reset } from '@/core/reset.js';
+export { Update } from '@/core/update.js';
 
 // Database utilities
 export {
@@ -47,12 +47,12 @@ export {
     roundDb,
     stageDb,
     tournamentDb,
-} from '@/core/db';
-export type { DrizzleDatabase } from '@/core/db';
+} from '@/core/db.js';
+export type { DrizzleDatabase } from '@/core/db.js';
 
 // Model exports (types from brackets-model)
-export * from '@/model';
+export * from '@/model/index.js';
 
 // Export drizzle schema and database factory
-export { createDatabase } from '@/storage/drizzle/db';
-export * as drizzleSchema from '@/storage/drizzle/db/schema';
+export { createDatabase } from '@/storage/drizzle/db/index.js';
+export * as drizzleSchema from '@/storage/drizzle/db/schema/index.js';

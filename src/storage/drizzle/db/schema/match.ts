@@ -1,10 +1,10 @@
-import type { ParticipantResult } from '@/model';
+import type { ParticipantResult } from '@/model/index.js';
 import { relations } from 'drizzle-orm';
 import { integer, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
-import { group } from './group';
-import { matchGame } from './match-game';
-import { round } from './round';
-import { stage } from './stage';
+import { group } from './group.js';
+import { matchGame } from './match-game.js';
+import { round } from './round.js';
+import { stage } from './stage.js';
 
 // A match in a round.
 export const match = pgTable('match', {

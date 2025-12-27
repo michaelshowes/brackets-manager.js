@@ -17,9 +17,9 @@ import {
     Stage,
     StageType,
     Status,
-} from '@/model';
+} from '@/model/index.js';
 
-import { ordering } from './ordering';
+import { ordering } from './ordering.js';
 import {
     Database,
     DeepPartial,
@@ -32,7 +32,7 @@ import {
     ParticipantSlot,
     Scores,
     Side,
-} from './types';
+} from './types.js';
 
 /**
  * Checks whether a value is defined (i.e. not null nor undefined).

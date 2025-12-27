@@ -1,7 +1,7 @@
-import { Match, Id, Status } from '@/model';
-import { BaseUpdater } from './base/updater';
-import * as helpers from './helpers';
-import { stageDb, groupDb, roundDb, matchDb, matchGameDb } from './db';
+import { Match, Id, Status } from '@/model/index.js';
+import { BaseUpdater } from './base/updater.js';
+import * as helpers from './helpers.js';
+import { stageDb, groupDb, roundDb, matchDb, matchGameDb } from './db.js';
 
 export class Reset extends BaseUpdater {
     /**

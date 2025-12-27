@@ -9,7 +9,7 @@ import {
     Round,
     SeedOrdering,
     Stage,
-} from '@/model';
+} from '@/model/index.js';
 
 /**
  * A tournament that can contain multiple stages and participants.

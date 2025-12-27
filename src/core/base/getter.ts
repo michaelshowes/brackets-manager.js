@@ -8,12 +8,12 @@ import {
     SeedOrdering,
     Stage,
     StageType,
-} from '@/model';
-import type { DrizzleDatabase } from '../db';
-import { groupDb, matchDb, matchGameDb, roundDb } from '../db';
-import * as helpers from '../helpers';
-import { DeepPartial, RoundPositionalInfo } from '../types';
-import { StageCreator } from './stage/creator';
+} from '@/model/index.js';
+import type { DrizzleDatabase } from '../db.js';
+import { groupDb, matchDb, matchGameDb, roundDb } from '../db.js';
+import * as helpers from '../helpers.js';
+import { DeepPartial, RoundPositionalInfo } from '../types.js';
+import { StageCreator } from './stage/creator.js';
 
 export class BaseGetter {
     protected readonly db: DrizzleDatabase;

@@ -1,11 +1,11 @@
-import { InputStage, Stage } from '@/model';
-import { StageCreator } from './base/stage/creator';
-import type { DrizzleDatabase } from './db';
-import { Delete } from './delete';
-import { Find } from './find';
-import { Get } from './get';
-import { Reset } from './reset';
-import { Update } from './update';
+import { InputStage, Stage } from '@/model/index.js';
+import { StageCreator } from './base/stage/creator.js';
+import type { DrizzleDatabase } from './db.js';
+import { Delete } from './delete.js';
+import { Find } from './find.js';
+import { Get } from './get.js';
+import { Reset } from './reset.js';
+import { Update } from './update.js';
 
 export class BracketsManager {
     public readonly db: DrizzleDatabase;

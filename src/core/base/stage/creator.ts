@@ -9,9 +9,9 @@ import {
     Seeding,
     SeedOrdering,
     Stage,
-} from '@/model';
+} from '@/model/index.js';
 import { v4 as uuidv4 } from 'uuid';
-import type { DrizzleDatabase } from '../../db';
+import type { DrizzleDatabase } from '../../db.js';
 import {
     groupDb,
     matchDb,
@@ -19,16 +19,16 @@ import {
     participantDb,
     roundDb,
     stageDb,
-} from '../../db';
-import * as helpers from '../../helpers';
-import { BracketsManager } from '../../manager';
-import { defaultMinorOrdering, ordering } from '../../ordering';
+} from '../../db.js';
+import * as helpers from '../../helpers.js';
+import { BracketsManager } from '../../manager.js';
+import { defaultMinorOrdering, ordering } from '../../ordering.js';
 import {
     Duel,
     OmitId,
     ParticipantSlot,
     StandardBracketResults,
-} from '../../types';
+} from '../../types.js';
 
 /**
  * Creates a stage.

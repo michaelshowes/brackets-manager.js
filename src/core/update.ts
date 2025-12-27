@@ -7,12 +7,12 @@ import {
     Seeding,
     SeedOrdering,
     Status,
-} from '@/model';
-import { ordering } from './ordering';
-import { BaseUpdater } from './base/updater';
-import { ChildCountLevel, DeepPartial } from './types';
-import * as helpers from './helpers';
-import { stageDb, groupDb, roundDb, matchDb, matchGameDb } from './db';
+} from '@/model/index.js';
+import { ordering } from './ordering.js';
+import { BaseUpdater } from './base/updater.js';
+import { ChildCountLevel, DeepPartial } from './types.js';
+import * as helpers from './helpers.js';
+import { stageDb, groupDb, roundDb, matchDb, matchGameDb } from './db.js';
 
 export class Update extends BaseUpdater {
     /**

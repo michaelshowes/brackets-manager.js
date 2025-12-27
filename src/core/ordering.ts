@@ -1,7 +1,7 @@
 // https://web.archive.org/web/20200601102344/https://tl.net/forum/sc2-tournaments/202139-superior-double-elimination-losers-bracket-seeding
 
-import { SeedOrdering } from '@/model';
-import { OrderingMap } from './types';
+import { SeedOrdering } from '@/model/index.js';
+import { OrderingMap } from './types.js';
 
 export const ordering: OrderingMap = {
     natural: <T>(array: T[]) => [...array],

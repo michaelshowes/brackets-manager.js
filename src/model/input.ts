@@ -2,14 +2,14 @@
  * Contains everything which is given by the user as input.
  *-----------------------------------------------------------*/
 
-import { Participant } from './storage';
+import { Participant } from './storage.js';
 import {
     GrandFinalType,
     Id,
     RoundRobinMode,
     SeedOrdering,
     StageType,
-} from './unions';
+} from './unions.js';
 
 /**
  * An item of the seeding with a `name` and extra fields.
