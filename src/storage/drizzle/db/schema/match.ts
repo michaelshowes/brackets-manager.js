@@ -10,21 +10,21 @@ import { stage } from './stage.js';
 export const match = pgTable('match', {
     id: text('id').primaryKey(),
     // ID of the parent stage.
-    stage_id: text('stage_id')
+    stageId: text('stage_id')
         .notNull()
         .references(() => stage.id),
     // ID of the parent group.
-    group_id: text('group_id')
+    groupId: text('group_id')
         .notNull()
         .references(() => group.id),
     // ID of the parent round.
-    round_id: text('round_id')
+    roundId: text('round_id')
         .notNull()
         .references(() => round.id),
     // The number of the match in its round
     number: integer('number').notNull(),
     // The count of match games this match has.
-    child_count: integer('child_count').notNull(),
+    childCount: integer('child_count').notNull(),
     // Status of the match (0=Locked, 1=Waiting, 2=Ready, 3=Running, 4=Completed, 5=Archived)
     status: integer('status').notNull(),
     // First opponent of the match (embedded as JSONB)
@@ -35,15 +35,15 @@ export const match = pgTable('match', {
 
 export const matchRelations = relations(match, ({ one, many }) => ({
     stage: one(stage, {
-        fields: [match.stage_id],
+        fields: [match.stageId],
         references: [stage.id],
     }),
     group: one(group, {
-        fields: [match.group_id],
+        fields: [match.groupId],
         references: [group.id],
     }),
     round: one(round, {
-        fields: [match.round_id],
+        fields: [match.roundId],
         references: [round.id],
     }),
     games: many(matchGame),

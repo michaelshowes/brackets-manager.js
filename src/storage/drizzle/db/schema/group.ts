@@ -8,7 +8,7 @@ import { stage } from './stage.js';
 export const group = pgTable('group', {
     id: text('id').primaryKey(),
     // ID of the parent stage.
-    stage_id: text('stage_id')
+    stageId: text('stage_id')
         .notNull()
         .references(() => stage.id),
     // The number of the group in its stage
@@ -17,7 +17,7 @@ export const group = pgTable('group', {
 
 export const groupRelations = relations(group, ({ one, many }) => ({
     stage: one(stage, {
-        fields: [group.stage_id],
+        fields: [group.stageId],
         references: [stage.id],
     }),
     rounds: many(round),

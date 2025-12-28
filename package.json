@@ -1,6 +1,6 @@
 {
     "name": "@mshowes/brackets-manager",
-    "version": "1.8.11",
+    "version": "1.8.12",
     "description": "A simple library to manage tournament brackets (based on brackets-manager.js)",
     "type": "module",
     "main": "./dist/index.js",

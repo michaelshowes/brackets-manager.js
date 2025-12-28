@@ -13,9 +13,9 @@ export const tournament = pgTable('tournament', {
     // Description of the tournament
     description: text('description'),
     // Start date of the tournament
-    start_date: timestamp('start_date'),
+    startDate: timestamp('start_date'),
     // End date of the tournament
-    end_date: timestamp('end_date'),
+    endDate: timestamp('end_date'),
     // Additional data for the tournament
     extra: jsonb('extra'),
 });

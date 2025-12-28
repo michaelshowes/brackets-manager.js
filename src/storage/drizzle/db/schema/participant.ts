@@ -5,7 +5,7 @@ import { tournament } from './tournament.js';
 // A participant of a stage (team or individual).
 export const participant = pgTable('participant', {
     id: text('id').primaryKey(),
-    tournament_id: text('tournament_id')
+    tournamentId: text('tournament_id')
         .notNull()
         .references(() => tournament.id),
     // Name of the participant
@@ -14,7 +14,7 @@ export const participant = pgTable('participant', {
 
 export const participantRelations = relations(participant, ({ one }) => ({
     tournament: one(tournament, {
-        fields: [participant.tournament_id],
+        fields: [participant.tournamentId],
         references: [tournament.id],
     }),
 }));

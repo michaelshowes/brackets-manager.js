@@ -8,11 +8,11 @@ import { stage } from './stage.js';
 export const round = pgTable('round', {
     id: text('id').primaryKey(),
     // ID of the parent stage.
-    stage_id: text('stage_id')
+    stageId: text('stage_id')
         .notNull()
         .references(() => stage.id),
     // ID of the parent group.
-    group_id: text('group_id')
+    groupId: text('group_id')
         .notNull()
         .references(() => group.id),
     // The number of the round in its group
@@ -21,11 +21,11 @@ export const round = pgTable('round', {
 
 export const roundRelations = relations(round, ({ one, many }) => ({
     stage: one(stage, {
-        fields: [round.stage_id],
+        fields: [round.stageId],
         references: [stage.id],
     }),
     group: one(group, {
-        fields: [round.group_id],
+        fields: [round.groupId],
         references: [group.id],
     }),
     matches: many(match),

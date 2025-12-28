@@ -8,11 +8,11 @@ import { stage } from './stage.js';
 export const matchGame = pgTable('match_game', {
     id: text('id').primaryKey(),
     // ID of the parent stage.
-    stage_id: text('stage_id')
+    stageId: text('stage_id')
         .notNull()
         .references(() => stage.id),
     // ID of the parent match.
-    parent_id: text('parent_id')
+    parentId: text('parent_id')
         .notNull()
         .references(() => match.id),
     // The number of the match game in its match
@@ -27,11 +27,11 @@ export const matchGame = pgTable('match_game', {
 
 export const matchGameRelations = relations(matchGame, ({ one }) => ({
     stage: one(stage, {
-        fields: [matchGame.stage_id],
+        fields: [matchGame.stageId],
         references: [stage.id],
     }),
     match: one(match, {
-        fields: [matchGame.parent_id],
+        fields: [matchGame.parentId],
         references: [match.id],
     }),
 }));

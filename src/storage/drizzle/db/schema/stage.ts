@@ -10,7 +10,7 @@ import { tournament } from './tournament.js';
 // A stage, which can be a round-robin stage or a single/double elimination stage.
 export const stage = pgTable('stage', {
     id: text('id').primaryKey(),
-    tournament_id: text('tournament_id')
+    tournamentId: text('tournament_id')
         .notNull()
         .references(() => tournament.id),
     // Name of the stage
@@ -36,7 +36,7 @@ export const stage = pgTable('stage', {
 
 export const stageRelations = relations(stage, ({ one, many }) => ({
     tournament: one(tournament, {
-        fields: [stage.tournament_id],
+        fields: [stage.tournamentId],
         references: [tournament.id],
     }),
     groups: many(group),
