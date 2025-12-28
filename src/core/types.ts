@@ -24,9 +24,9 @@ export interface Tournament {
     /** Description of the tournament. */
     description?: string | null;
     /** Start date of the tournament. */
-    start_date?: Date | null;
+    startDate?: Date | null;
     /** End date of the tournament. */
-    end_date?: Date | null;
+    endDate?: Date | null;
     /** Additional data for the tournament. */
     extra?: Record<string, unknown>;
 }
@@ -42,9 +42,9 @@ export interface InputTournament {
     /** Description of the tournament. */
     description?: string | null;
     /** Start date of the tournament. */
-    start_date?: Date | string | null;
+    startDate?: Date | string | null;
     /** End date of the tournament. */
-    end_date?: Date | string | null;
+    endDate?: Date | string | null;
     /** Additional data for the tournament. */
     extra?: Record<string, unknown>;
 }

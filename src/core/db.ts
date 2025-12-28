@@ -138,18 +138,18 @@ export const participantDb = {
         const results = await db
             .select()
             .from(participant)
-            .where(eq(participant.tournament_id, toStr(tournamentId)));
+            .where(eq(participant.tournamentId, toStr(tournamentId)));
         return results.map(castParticipant);
     },
 
     async getByFilter(
         db: DrizzleDatabase,
-        filter: { tournament_id?: Id; name?: string },
+        filter: { tournamentId?: Id; name?: string },
     ): Promise<Participant[]> {
         const conditions = [];
-        if (filter.tournament_id !== undefined) {
+        if (filter.tournamentId !== undefined) {
             conditions.push(
-                eq(participant.tournament_id, toStr(filter.tournament_id)),
+                eq(participant.tournamentId, toStr(filter.tournamentId)),
             );
         }
         if (filter.name !== undefined) {
@@ -175,13 +175,13 @@ export const participantDb = {
 
     async delete(
         db: DrizzleDatabase,
-        filter?: { tournament_id?: Id },
+        filter?: { tournamentId?: Id },
     ): Promise<boolean> {
-        if (filter?.tournament_id !== undefined) {
+        if (filter?.tournamentId !== undefined) {
             await db
                 .delete(participant)
                 .where(
-                    eq(participant.tournament_id, toStr(filter.tournament_id)),
+                    eq(participant.tournamentId, toStr(filter.tournamentId)),
                 );
         } else {
             await db.delete(participant);
@@ -219,7 +219,7 @@ export const stageDb = {
         const results = await db
             .select()
             .from(stage)
-            .where(eq(stage.tournament_id, toStr(tournamentId)))
+            .where(eq(stage.tournamentId, toStr(tournamentId)))
             .orderBy(asc(stage.number));
         return results.map(castStage);
     },
@@ -247,14 +247,14 @@ export const stageDb = {
 
     async delete(
         db: DrizzleDatabase,
-        filter?: { id?: Id; tournament_id?: Id },
+        filter?: { id?: Id; tournamentId?: Id },
     ): Promise<boolean> {
         if (filter?.id !== undefined) {
             await db.delete(stage).where(eq(stage.id, toStr(filter.id)));
-        } else if (filter?.tournament_id !== undefined) {
+        } else if (filter?.tournamentId !== undefined) {
             await db
                 .delete(stage)
-                .where(eq(stage.tournament_id, toStr(filter.tournament_id)));
+                .where(eq(stage.tournamentId, toStr(filter.tournamentId)));
         } else {
             await db.delete(stage);
         }
@@ -280,16 +280,16 @@ export const groupDb = {
         const results = await db
             .select()
             .from(group)
-            .where(eq(group.stage_id, toStr(stageId)))
+            .where(eq(group.stageId, toStr(stageId)))
             .orderBy(asc(group.number));
         return results.map(castGroup);
     },
 
     async getFirst(
         db: DrizzleDatabase,
-        filter: { stage_id: Id; number?: number },
+        filter: { stageId: Id; number?: number },
     ): Promise<Group | null> {
-        const conditions = [eq(group.stage_id, toStr(filter.stage_id))];
+        const conditions = [eq(group.stageId, toStr(filter.stageId))];
         if (filter.number !== undefined) {
             conditions.push(eq(group.number, filter.number));
         }
@@ -313,12 +313,12 @@ export const groupDb = {
 
     async delete(
         db: DrizzleDatabase,
-        filter?: { stage_id?: Id },
+        filter?: { stageId?: Id },
     ): Promise<boolean> {
-        if (filter?.stage_id !== undefined) {
+        if (filter?.stageId !== undefined) {
             await db
                 .delete(group)
-                .where(eq(group.stage_id, toStr(filter.stage_id)));
+                .where(eq(group.stageId, toStr(filter.stageId)));
         } else {
             await db.delete(group);
         }
@@ -344,7 +344,7 @@ export const roundDb = {
         const results = await db
             .select()
             .from(round)
-            .where(eq(round.stage_id, toStr(stageId)))
+            .where(eq(round.stageId, toStr(stageId)))
             .orderBy(asc(round.number));
         return results.map(castRound);
     },
@@ -353,21 +353,21 @@ export const roundDb = {
         const results = await db
             .select()
             .from(round)
-            .where(eq(round.group_id, toStr(groupId)))
+            .where(eq(round.groupId, toStr(groupId)))
             .orderBy(asc(round.number));
         return results.map(castRound);
     },
 
     async getFirst(
         db: DrizzleDatabase,
-        filter: { stage_id?: Id; group_id?: Id; number?: number },
+        filter: { stageId?: Id; groupId?: Id; number?: number },
     ): Promise<Round | null> {
         const conditions = [];
-        if (filter.stage_id !== undefined) {
-            conditions.push(eq(round.stage_id, toStr(filter.stage_id)));
+        if (filter.stageId !== undefined) {
+            conditions.push(eq(round.stageId, toStr(filter.stageId)));
         }
-        if (filter.group_id !== undefined) {
-            conditions.push(eq(round.group_id, toStr(filter.group_id)));
+        if (filter.groupId !== undefined) {
+            conditions.push(eq(round.groupId, toStr(filter.groupId)));
         }
         if (filter.number !== undefined) {
             conditions.push(eq(round.number, filter.number));
@@ -383,12 +383,12 @@ export const roundDb = {
 
     async getLast(
         db: DrizzleDatabase,
-        filter: { group_id: Id },
+        filter: { groupId: Id },
     ): Promise<Round | null> {
         const results = await db
             .select()
             .from(round)
-            .where(eq(round.group_id, toStr(filter.group_id)))
+            .where(eq(round.groupId, toStr(filter.groupId)))
             .orderBy(desc(round.number))
             .limit(1);
         return results[0] ? castRound(results[0]) : null;
@@ -405,12 +405,12 @@ export const roundDb = {
 
     async delete(
         db: DrizzleDatabase,
-        filter?: { stage_id?: Id },
+        filter?: { stageId?: Id },
     ): Promise<boolean> {
-        if (filter?.stage_id !== undefined) {
+        if (filter?.stageId !== undefined) {
             await db
                 .delete(round)
-                .where(eq(round.stage_id, toStr(filter.stage_id)));
+                .where(eq(round.stageId, toStr(filter.stageId)));
         } else {
             await db.delete(round);
         }
@@ -436,7 +436,7 @@ export const matchDb = {
         const results = await db
             .select()
             .from(match)
-            .where(eq(match.stage_id, toStr(stageId)))
+            .where(eq(match.stageId, toStr(stageId)))
             .orderBy(asc(match.number));
         return results.map(castMatch);
     },
@@ -445,7 +445,7 @@ export const matchDb = {
         const results = await db
             .select()
             .from(match)
-            .where(eq(match.round_id, toStr(roundId)))
+            .where(eq(match.roundId, toStr(roundId)))
             .orderBy(asc(match.number));
         return results.map(castMatch);
     },
@@ -454,21 +454,21 @@ export const matchDb = {
         const results = await db
             .select()
             .from(match)
-            .where(eq(match.group_id, toStr(groupId)))
+            .where(eq(match.groupId, toStr(groupId)))
             .orderBy(asc(match.number));
         return results.map(castMatch);
     },
 
     async getFirst(
         db: DrizzleDatabase,
-        filter: { round_id?: Id; group_id?: Id; number?: number },
+        filter: { roundId?: Id; groupId?: Id; number?: number },
     ): Promise<Match | null> {
         const conditions = [];
-        if (filter.round_id !== undefined) {
-            conditions.push(eq(match.round_id, toStr(filter.round_id)));
+        if (filter.roundId !== undefined) {
+            conditions.push(eq(match.roundId, toStr(filter.roundId)));
         }
-        if (filter.group_id !== undefined) {
-            conditions.push(eq(match.group_id, toStr(filter.group_id)));
+        if (filter.groupId !== undefined) {
+            conditions.push(eq(match.groupId, toStr(filter.groupId)));
         }
         if (filter.number !== undefined) {
             conditions.push(eq(match.number, filter.number));
@@ -505,18 +505,18 @@ export const matchDb = {
 
     async updateByFilter(
         db: DrizzleDatabase,
-        filter: { stage_id?: Id; group_id?: Id; round_id?: Id; parent_id?: Id },
+        filter: { stageId?: Id; groupId?: Id; roundId?: Id; parentId?: Id },
         data: Partial<Match>,
     ): Promise<boolean> {
         const conditions = [];
-        if (filter.stage_id !== undefined) {
-            conditions.push(eq(match.stage_id, toStr(filter.stage_id)));
+        if (filter.stageId !== undefined) {
+            conditions.push(eq(match.stageId, toStr(filter.stageId)));
         }
-        if (filter.group_id !== undefined) {
-            conditions.push(eq(match.group_id, toStr(filter.group_id)));
+        if (filter.groupId !== undefined) {
+            conditions.push(eq(match.groupId, toStr(filter.groupId)));
         }
-        if (filter.round_id !== undefined) {
-            conditions.push(eq(match.round_id, toStr(filter.round_id)));
+        if (filter.roundId !== undefined) {
+            conditions.push(eq(match.roundId, toStr(filter.roundId)));
         }
         if (conditions.length === 0) return false;
         await db
@@ -528,12 +528,12 @@ export const matchDb = {
 
     async delete(
         db: DrizzleDatabase,
-        filter?: { stage_id?: Id },
+        filter?: { stageId?: Id },
     ): Promise<boolean> {
-        if (filter?.stage_id !== undefined) {
+        if (filter?.stageId !== undefined) {
             await db
                 .delete(match)
-                .where(eq(match.stage_id, toStr(filter.stage_id)));
+                .where(eq(match.stageId, toStr(filter.stageId)));
         } else {
             await db.delete(match);
         }
@@ -559,18 +559,18 @@ export const matchGameDb = {
         const results = await db
             .select()
             .from(matchGame)
-            .where(eq(matchGame.parent_id, toStr(parentId)))
+            .where(eq(matchGame.parentId, toStr(parentId)))
             .orderBy(asc(matchGame.number));
         return results.map(castMatchGame);
     },
 
     async getFirst(
         db: DrizzleDatabase,
-        filter: { parent_id?: Id; number?: number },
+        filter: { parentId?: Id; number?: number },
     ): Promise<MatchGame | null> {
         const conditions = [];
-        if (filter.parent_id !== undefined) {
-            conditions.push(eq(matchGame.parent_id, toStr(filter.parent_id)));
+        if (filter.parentId !== undefined) {
+            conditions.push(eq(matchGame.parentId, toStr(filter.parentId)));
         }
         if (filter.number !== undefined) {
             conditions.push(eq(matchGame.number, filter.number));
@@ -607,12 +607,12 @@ export const matchGameDb = {
 
     async updateByFilter(
         db: DrizzleDatabase,
-        filter: { parent_id?: Id },
+        filter: { parentId?: Id },
         data: Partial<MatchGame>,
     ): Promise<boolean> {
         const conditions = [];
-        if (filter.parent_id !== undefined) {
-            conditions.push(eq(matchGame.parent_id, toStr(filter.parent_id)));
+        if (filter.parentId !== undefined) {
+            conditions.push(eq(matchGame.parentId, toStr(filter.parentId)));
         }
         if (conditions.length === 0) return false;
         await db
@@ -624,28 +624,28 @@ export const matchGameDb = {
 
     async delete(
         db: DrizzleDatabase,
-        filter?: { stage_id?: Id; parent_id?: Id; number?: number },
+        filter?: { stageId?: Id; parentId?: Id; number?: number },
     ): Promise<boolean> {
-        if (filter?.stage_id !== undefined) {
+        if (filter?.stageId !== undefined) {
             await db
                 .delete(matchGame)
-                .where(eq(matchGame.stage_id, toStr(filter.stage_id)));
+                .where(eq(matchGame.stageId, toStr(filter.stageId)));
         } else if (
-            filter?.parent_id !== undefined &&
+            filter?.parentId !== undefined &&
             filter?.number !== undefined
         ) {
             await db
                 .delete(matchGame)
                 .where(
                     and(
-                        eq(matchGame.parent_id, toStr(filter.parent_id)),
+                        eq(matchGame.parentId, toStr(filter.parentId)),
                         eq(matchGame.number, filter.number),
                     ),
                 );
-        } else if (filter?.parent_id !== undefined) {
+        } else if (filter?.parentId !== undefined) {
             await db
                 .delete(matchGame)
-                .where(eq(matchGame.parent_id, toStr(filter.parent_id)));
+                .where(eq(matchGame.parentId, toStr(filter.parentId)));
         } else {
             await db.delete(matchGame);
         }

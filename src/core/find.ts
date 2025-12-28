@@ -33,7 +33,7 @@ export class Find {
      * @param number Number of the group.
      */
     public async group(stageId: Id, number: number): Promise<Group | null> {
-        return groupDb.getFirst(this.db, { stage_id: stageId, number });
+        return groupDb.getFirst(this.db, { stageId: stageId, number });
     }
 
     /**
@@ -43,7 +43,7 @@ export class Find {
      * @param number Number of the round in its group.
      */
     public async round(groupId: Id, number: number): Promise<Round | null> {
-        return roundDb.getFirst(this.db, { group_id: groupId, number });
+        return roundDb.getFirst(this.db, { groupId: groupId, number });
     }
 
     /**
@@ -53,6 +53,6 @@ export class Find {
      * @param number Number of the match in its round.
      */
     public async match(roundId: Id, number: number): Promise<Match | null> {
-        return matchDb.getFirst(this.db, { round_id: roundId, number });
+        return matchDb.getFirst(this.db, { roundId: roundId, number });
     }
 }

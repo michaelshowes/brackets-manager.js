@@ -275,7 +275,7 @@ export class StageCreator {
         slots: ParticipantSlot[],
     ): Promise<void> {
         const groupId = await this.insertGroup({
-            stage_id: stageId,
+            stageId: stageId,
             number: groupNumber,
         });
 
@@ -312,7 +312,7 @@ export class StageCreator {
     ): Promise<StandardBracketResults> {
         const roundCount = helpers.getUpperBracketRoundCount(slots.length);
         const groupId = await this.insertGroup({
-            stage_id: stageId,
+            stageId: stageId,
             number: groupNumber,
         });
 
@@ -363,7 +363,7 @@ export class StageCreator {
         const ordered = ordering[method](losers[losersId++]);
 
         const groupId = await this.insertGroup({
-            stage_id: stageId,
+            stageId: stageId,
             number: groupNumber,
         });
 
@@ -435,7 +435,7 @@ export class StageCreator {
             roundNumberStart = rounds.length + 1;
         } else {
             groupId = await this.insertGroup({
-                stage_id: stageId,
+                stageId: stageId,
                 number: groupNumber,
             });
 
@@ -477,8 +477,8 @@ export class StageCreator {
 
         const roundId = await this.insertRound({
             number: roundNumber,
-            stage_id: stageId,
-            group_id: groupId,
+            stageId: stageId,
+            groupId: groupId,
         });
 
         if (roundId === -1) throw Error('Could not insert the round.');
@@ -531,11 +531,11 @@ export class StageCreator {
 
         if (this.updateMode) {
             existing = await matchDb.getFirst(this.db, {
-                round_id: roundId,
+                roundId: roundId,
                 number: matchNumber,
             });
 
-            const currentChildCount = existing?.child_count;
+            const currentChildCount = existing?.childCount;
             childCount =
                 currentChildCount === undefined
                     ? childCount
@@ -551,10 +551,10 @@ export class StageCreator {
         const parentId = await this.insertMatch(
             {
                 number: matchNumber,
-                stage_id: stageId,
-                group_id: groupId,
-                round_id: roundId,
-                child_count: childCount,
+                stageId: stageId,
+                groupId: groupId,
+                roundId: roundId,
+                childCount: childCount,
                 status: status,
                 ...helpers.getInferredResult(opponent1, opponent2),
             },
@@ -566,8 +566,8 @@ export class StageCreator {
         for (let i = 0; i < childCount; i++) {
             const id = await this.insertMatchGame({
                 number: i + 1,
-                stage_id: stageId,
-                parent_id: parentId,
+                stageId: stageId,
+                parentId: parentId,
                 status: status,
                 ...helpers.getInferredResult(
                     helpers.toResult(opponents[0]),
@@ -946,7 +946,7 @@ export class StageCreator {
             const id = uuidv4();
             await stageDb.insert(this.db, {
                 id,
-                tournament_id: String(stageData.tournament_id),
+                tournamentId: String(stageData.tournamentId),
                 name: stageData.name,
                 type: stageData.type,
                 number: stageData.number,
@@ -968,7 +968,7 @@ export class StageCreator {
 
         if (this.updateMode) {
             existing = await groupDb.getFirst(this.db, {
-                stage_id: groupData.stage_id,
+                stageId: groupData.stageId,
                 number: groupData.number,
             });
         }
@@ -977,7 +977,7 @@ export class StageCreator {
             const id = uuidv4();
             await groupDb.insert(this.db, {
                 id,
-                stage_id: String(groupData.stage_id),
+                stageId: String(groupData.stageId),
                 number: groupData.number,
             });
             return id;
@@ -996,7 +996,7 @@ export class StageCreator {
 
         if (this.updateMode) {
             existing = await roundDb.getFirst(this.db, {
-                group_id: roundData.group_id,
+                groupId: roundData.groupId,
                 number: roundData.number,
             });
         }
@@ -1005,8 +1005,8 @@ export class StageCreator {
             const id = uuidv4();
             await roundDb.insert(this.db, {
                 id,
-                stage_id: String(roundData.stage_id),
-                group_id: String(roundData.group_id),
+                stageId: String(roundData.stageId),
+                groupId: String(roundData.groupId),
                 number: roundData.number,
             });
             return id;
@@ -1029,11 +1029,11 @@ export class StageCreator {
             const id = uuidv4();
             await matchDb.insert(this.db, {
                 id,
-                stage_id: String(matchData.stage_id),
-                group_id: String(matchData.group_id),
-                round_id: String(matchData.round_id),
+                stageId: String(matchData.stageId),
+                groupId: String(matchData.groupId),
+                roundId: String(matchData.roundId),
                 number: matchData.number,
-                child_count: matchData.child_count,
+                childCount: matchData.childCount,
                 status: matchData.status,
                 opponent1: matchData.opponent1,
                 opponent2: matchData.opponent2,
@@ -1063,7 +1063,7 @@ export class StageCreator {
 
         if (this.updateMode) {
             existing = await matchGameDb.getFirst(this.db, {
-                parent_id: matchGameData.parent_id,
+                parentId: matchGameData.parentId,
                 number: matchGameData.number,
             });
         }
@@ -1072,8 +1072,8 @@ export class StageCreator {
             const id = uuidv4();
             await matchGameDb.insert(this.db, {
                 id,
-                stage_id: String(matchGameData.stage_id),
-                parent_id: String(matchGameData.parent_id),
+                stageId: String(matchGameData.stageId),
+                parentId: String(matchGameData.parentId),
                 number: matchGameData.number,
                 status: matchGameData.status,
                 opponent1: matchGameData.opponent1,
@@ -1109,7 +1109,7 @@ export class StageCreator {
         if (!existing || existing.length === 0) {
             const withIds = participants.map((p) => ({
                 id: uuidv4(),
-                tournament_id: String(p.tournament_id),
+                tournamentId: String(p.tournamentId),
                 name: p.name,
             }));
             await participantDb.insert(this.db, withIds);
@@ -1122,7 +1122,7 @@ export class StageCreator {
 
             await participantDb.insert(this.db, {
                 id: uuidv4(),
-                tournament_id: String(p.tournament_id),
+                tournamentId: String(p.tournamentId),
                 name: p.name,
             });
         }
@@ -1137,7 +1137,7 @@ export class StageCreator {
         const stageNumber = await this.getStageNumber();
 
         const stage: OmitId<Stage> = {
-            tournament_id: this.stage.tournamentId,
+            tournamentId: this.stage.tournamentId,
             name: this.stage.name,
             type: this.stage.type,
             number: stageNumber,

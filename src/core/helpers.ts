@@ -272,20 +272,20 @@ export function normalizeIds(data: Database): Database {
         group: data.group.map((value) => ({
             ...value,
             id: mappings.group[value.id],
-            stage_id: mappings.stage[value.stage_id],
+            stageId: mappings.stage[value.stageId],
         })),
         round: data.round.map((value) => ({
             ...value,
             id: mappings.round[value.id],
-            stage_id: mappings.stage[value.stage_id],
-            group_id: mappings.group[value.group_id],
+            stageId: mappings.stage[value.stageId],
+            groupId: mappings.group[value.groupId],
         })),
         match: data.match.map((value) => ({
             ...value,
             id: mappings.match[value.id],
-            stage_id: mappings.stage[value.stage_id],
-            group_id: mappings.group[value.group_id],
-            round_id: mappings.round[value.round_id],
+            stageId: mappings.stage[value.stageId],
+            groupId: mappings.group[value.groupId],
+            roundId: mappings.round[value.roundId],
             opponent1: normalizeParticipant(
                 value.opponent1,
                 mappings.participant,
@@ -298,8 +298,8 @@ export function normalizeIds(data: Database): Database {
         match_game: data.match_game.map((value) => ({
             ...value,
             id: mappings.match_game[value.id],
-            stage_id: mappings.stage[value.stage_id],
-            parent_id: mappings.match[value.parent_id],
+            stageId: mappings.stage[value.stageId],
+            parentId: mappings.match[value.parentId],
             opponent1: normalizeParticipant(
                 value.opponent1,
                 mappings.participant,
@@ -1005,14 +1005,14 @@ export function setExtraFields(
     const ignoredKeys: Array<keyof (Match & MatchGame)> = [
         'id',
         'number',
-        'stage_id',
-        'group_id',
-        'round_id',
+        'stageId',
+        'groupId',
+        'roundId',
         'status',
         'opponent1',
         'opponent2',
-        'child_count',
-        'parent_id',
+        'childCount',
+        'parentId',
     ];
 
     const ignoredOpponentKeys: Array<keyof ParticipantResult> = [
@@ -1068,8 +1068,8 @@ export function getLosers(
     let roundIndex = -1;
 
     for (const match of matches) {
-        if (match.round_id !== currentRound) {
-            currentRound = match.round_id;
+        if (match.roundId !== currentRound) {
+            currentRound = match.roundId;
             roundIndex++;
             losers[roundIndex] = [];
         }
@@ -1528,14 +1528,14 @@ export function extractParticipantsFromSeeding(
     const participants = withoutByes.map<OmitId<Participant>>((item) => {
         if (typeof item === 'string') {
             return {
-                tournament_id: tournamentId,
+                tournamentId: tournamentId,
                 name: item,
             };
         }
 
         return {
             ...item,
-            tournament_id: tournamentId,
+            tournamentId: tournamentId,
             name: item.name,
         };
     });

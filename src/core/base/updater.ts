@@ -44,7 +44,7 @@ export class BaseUpdater extends BaseGetter {
 
         const creator = new StageCreator(this.db, {
             name: stage.name,
-            tournamentId: stage.tournament_id,
+            tournamentId: stage.tournamentId,
             type: stage.type,
             settings: {
                 ...stage.settings,
@@ -87,7 +87,7 @@ export class BaseUpdater extends BaseGetter {
 
         const creator = new StageCreator(this.db, {
             name: stage.name,
-            tournamentId: stage.tournament_id,
+            tournamentId: stage.tournamentId,
             type: stage.type,
             settings: stage.settings,
             seeding: newSeeding,
@@ -122,7 +122,7 @@ export class BaseUpdater extends BaseGetter {
 
         helpers.setParentMatchCompleted(
             parent,
-            storedParent.child_count,
+            storedParent.childCount,
             inRoundRobin,
         );
 
@@ -174,21 +174,21 @@ export class BaseUpdater extends BaseGetter {
         updatePrevious: boolean,
         updateNext: boolean,
     ): Promise<void> {
-        // This is a consolation match (doesn't have a `group_id`, nor a `round_id`).
+        // This is a consolation match (doesn't have a `groupId`, nor a `roundId`).
         // It doesn't have any related matches from the POV of the library, because the
         // creation of consolation matches is handled by the user.
-        if (match.round_id === undefined) return;
+        if (match.roundId === undefined) return;
 
         const { roundNumber, roundCount } = await this.getRoundPositionalInfo(
-            match.round_id,
+            match.roundId,
         );
 
-        const stage = await stageDb.getById(this.db, match.stage_id);
+        const stage = await stageDb.getById(this.db, match.stageId);
         if (!stage) throw Error('Stage not found.');
 
         const group = await (
             await import('../db.js')
-        ).groupDb.getById(this.db, match.group_id);
+        ).groupDb.getById(this.db, match.groupId);
         if (!group) throw Error('Group not found.');
 
         const matchLocation = helpers.getMatchLocation(
@@ -228,7 +228,7 @@ export class BaseUpdater extends BaseGetter {
         if (!force && helpers.isMatchUpdateLocked(stored))
             throw Error('The match is locked.');
 
-        const stage = await stageDb.getById(this.db, stored.stage_id);
+        const stage = await stageDb.getById(this.db, stored.stageId);
         if (!stage) throw Error('Stage not found.');
 
         const inRoundRobin = helpers.isRoundRobin(stage);
@@ -264,7 +264,7 @@ export class BaseUpdater extends BaseGetter {
         if (helpers.isMatchUpdateLocked(stored))
             throw Error('The match game is locked.');
 
-        const stage = await stageDb.getById(this.db, stored.stage_id);
+        const stage = await stageDb.getById(this.db, stored.stageId);
         if (!stage) throw Error('Stage not found.');
 
         const inRoundRobin = helpers.isRoundRobin(stage);
@@ -273,7 +273,7 @@ export class BaseUpdater extends BaseGetter {
 
         await matchGameDb.update(this.db, stored.id, stored);
 
-        await this.updateParentMatch(stored.parent_id, inRoundRobin);
+        await this.updateParentMatch(stored.parentId, inRoundRobin);
     }
 
     /**
@@ -284,7 +284,7 @@ export class BaseUpdater extends BaseGetter {
     protected async applyMatchUpdate(match: Match): Promise<void> {
         await matchDb.update(this.db, match.id, match);
 
-        if (match.child_count === 0) return;
+        if (match.childCount === 0) return;
 
         const updatedMatchGame: Partial<MatchGame> = {
             opponent1: helpers.toResult(match.opponent1),
@@ -298,7 +298,7 @@ export class BaseUpdater extends BaseGetter {
 
         await matchGameDb.updateByFilter(
             this.db,
-            { parent_id: match.id },
+            { parentId: match.id },
             updatedMatchGame,
         );
     }

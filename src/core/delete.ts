@@ -36,7 +36,7 @@ export class Delete {
         await this.tournamentStages(tournamentId);
 
         // Delete participants
-        await participantDb.delete(this.db, { tournament_id: tournamentId });
+        await participantDb.delete(this.db, { tournamentId: tournamentId });
 
         // Finally, delete the tournament itself
         await tournamentDb.delete(this.db, tournamentId);
@@ -72,10 +72,10 @@ export class Delete {
     public async stage(stageId: Id): Promise<void> {
         // The order is important here, because the abstract storage can possibly have foreign key checks (e.g. SQL).
 
-        await matchGameDb.delete(this.db, { stage_id: stageId });
-        await matchDb.delete(this.db, { stage_id: stageId });
-        await roundDb.delete(this.db, { stage_id: stageId });
-        await groupDb.delete(this.db, { stage_id: stageId });
+        await matchGameDb.delete(this.db, { stageId: stageId });
+        await matchDb.delete(this.db, { stageId: stageId });
+        await roundDb.delete(this.db, { stageId: stageId });
+        await groupDb.delete(this.db, { stageId: stageId });
         await stageDb.delete(this.db, { id: stageId });
     }
 }

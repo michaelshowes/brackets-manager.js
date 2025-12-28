@@ -15,14 +15,14 @@ export class Reset extends BaseUpdater {
         const stored = await matchDb.getById(this.db, matchId);
         if (!stored) throw Error('Match not found.');
 
-        const stage = await stageDb.getById(this.db, stored.stage_id);
+        const stage = await stageDb.getById(this.db, stored.stageId);
         if (!stage) throw Error('Stage not found.');
 
-        const group = await groupDb.getById(this.db, stored.group_id);
+        const group = await groupDb.getById(this.db, stored.groupId);
         if (!group) throw Error('Group not found.');
 
         const { roundNumber, roundCount } = await this.getRoundPositionalInfo(
-            stored.round_id,
+            stored.roundId,
         );
         const matchLocation = helpers.getMatchLocation(
             stage.type,
@@ -66,14 +66,14 @@ export class Reset extends BaseUpdater {
         const stored = await matchGameDb.getById(this.db, gameId);
         if (!stored) throw Error('Match game not found.');
 
-        const stage = await stageDb.getById(this.db, stored.stage_id);
+        const stage = await stageDb.getById(this.db, stored.stageId);
         if (!stage) throw Error('Stage not found.');
 
         const inRoundRobin = helpers.isRoundRobin(stage);
         helpers.resetMatchResults(stored);
 
         await matchGameDb.update(this.db, stored.id, stored);
-        await this.updateParentMatch(stored.parent_id, inRoundRobin);
+        await this.updateParentMatch(stored.parentId, inRoundRobin);
     }
 
     /**

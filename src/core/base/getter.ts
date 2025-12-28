@@ -70,7 +70,7 @@ export class BaseGetter {
 
         const firstRoundWB = rounds[0];
 
-        const roundsLB = rounds.filter((r) => r.group_id === loserBracket.id);
+        const roundsLB = rounds.filter((r) => r.groupId === loserBracket.id);
         const orderedRoundsLB = roundsLB.filter((r) =>
             helpers.isOrderingSupportedLoserBracket(r.number, roundsLB.length),
         );
@@ -89,7 +89,7 @@ export class BaseGetter {
         const round = await roundDb.getById(this.db, roundId);
         if (!round) throw Error('Round not found.');
 
-        const rounds = await roundDb.getByGroup(this.db, round.group_id);
+        const rounds = await roundDb.getByGroup(this.db, round.groupId);
         if (!rounds || rounds.length === 0)
             throw Error('Error getting rounds.');
 
@@ -155,13 +155,13 @@ export class BaseGetter {
         match: Match,
         stage: Stage,
     ): Promise<Match[]> {
-        const upperBracket = await this.getUpperBracket(match.stage_id);
+        const upperBracket = await this.getUpperBracket(match.stageId);
         const upperBracketRoundCount = helpers.getUpperBracketRoundCount(
             stage.settings.size!,
         );
 
         const semiFinalsRound = await roundDb.getFirst(this.db, {
-            group_id: upperBracket.id,
+            groupId: upperBracket.id,
             number: upperBracketRoundCount - 1, // Second to last round
         });
 
@@ -191,24 +191,24 @@ export class BaseGetter {
     ): Promise<Match[]> {
         if (roundNumber > 1)
             // Double grand final
-            return [await this.findMatch(match.group_id, roundNumber - 1, 1)];
+            return [await this.findMatch(match.groupId, roundNumber - 1, 1)];
 
-        const winnerBracket = await this.getUpperBracket(match.stage_id);
+        const winnerBracket = await this.getUpperBracket(match.stageId);
         const lastRoundWB = await this.getLastRound(winnerBracket.id);
 
         const winnerBracketFinalMatch = await matchDb.getFirst(this.db, {
-            round_id: lastRoundWB.id,
+            roundId: lastRoundWB.id,
             number: 1,
         });
 
         if (!winnerBracketFinalMatch) throw Error('Match not found.');
 
-        const loserBracket = await this.getLoserBracket(match.stage_id);
+        const loserBracket = await this.getLoserBracket(match.stageId);
         if (!loserBracket) throw Error('Loser bracket not found.');
 
         const lastRoundLB = await this.getLastRound(loserBracket.id);
         const loserBracketFinalMatch = await matchDb.getFirst(this.db, {
-            round_id: lastRoundLB.id,
+            roundId: lastRoundLB.id,
             number: 1,
         });
 
@@ -233,7 +233,7 @@ export class BaseGetter {
 
         if (helpers.hasBye(match)) return []; // Shortcut because we are coming from propagateByes().
 
-        const winnerBracket = await this.getUpperBracket(match.stage_id);
+        const winnerBracket = await this.getUpperBracket(match.stageId);
         const actualRoundNumberWB = Math.ceil((roundNumber + 1) / 2);
 
         const roundNumberWB = stage.settings.skipFirstRound
@@ -270,12 +270,12 @@ export class BaseGetter {
     ): Promise<Match[]> {
         return [
             await this.findMatch(
-                match.group_id,
+                match.groupId,
                 roundNumber - 1,
                 match.number * 2 - 1,
             ),
             await this.findMatch(
-                match.group_id,
+                match.groupId,
                 roundNumber - 1,
                 match.number * 2,
             ),
@@ -326,7 +326,7 @@ export class BaseGetter {
 
         return [
             await this.findMatch(winnerBracketId, roundNumberWB, matchNumber),
-            await this.findMatch(match.group_id, roundNumber - 1, match.number),
+            await this.findMatch(match.groupId, roundNumber - 1, match.number),
         ];
     }
 
@@ -394,7 +394,7 @@ export class BaseGetter {
         roundNumber: number,
         roundCount: number,
     ): Promise<(Match | null)[]> {
-        const loserBracket = await this.getLoserBracket(match.stage_id);
+        const loserBracket = await this.getLoserBracket(match.stageId);
         if (loserBracket === null)
             // Only one match in the stage, there is no loser bracket.
             return [];
@@ -478,7 +478,7 @@ export class BaseGetter {
     ): Promise<Match[]> {
         if (roundNumber === roundCount - 1) {
             const finalGroupId = await this.getFinalGroupId(
-                match.stage_id,
+                match.stageId,
                 stageType,
             );
             const consolationFinal = await this.getFinalGroupFirstMatch(
@@ -486,7 +486,7 @@ export class BaseGetter {
             );
             return [
                 await this.getDiagonalMatch(
-                    match.group_id,
+                    match.groupId,
                     roundNumber,
                     match.number,
                 ),
@@ -498,7 +498,7 @@ export class BaseGetter {
 
         return [
             await this.getDiagonalMatch(
-                match.group_id,
+                match.groupId,
                 roundNumber,
                 match.number,
             ),
@@ -521,7 +521,7 @@ export class BaseGetter {
     ): Promise<(Match | null)[]> {
         if (roundNumber === roundCount) {
             const finalGroupId = await this.getFinalGroupId(
-                match.stage_id,
+                match.stageId,
                 stageType,
             );
             return [await this.getFinalGroupFirstMatch(finalGroupId)];
@@ -529,7 +529,7 @@ export class BaseGetter {
 
         return [
             await this.getDiagonalMatch(
-                match.group_id,
+                match.groupId,
                 roundNumber,
                 match.number,
             ),
@@ -552,7 +552,7 @@ export class BaseGetter {
     ): Promise<(Match | null)[]> {
         if (roundNumber === roundCount - 1) {
             const finalGroupId = await this.getFinalGroupId(
-                match.stage_id,
+                match.stageId,
                 stage.type,
             );
             const consolationFinal =
@@ -567,7 +567,7 @@ export class BaseGetter {
 
         if (roundNumber === roundCount) {
             const finalGroupId = await this.getFinalGroupId(
-                match.stage_id,
+                match.stageId,
                 stage.type,
             );
             const grandFinal = await this.getFinalGroupFirstMatch(finalGroupId);
@@ -612,7 +612,7 @@ export class BaseGetter {
         if (finalGroupId === null) return null;
 
         return matchDb.getFirst(this.db, {
-            group_id: finalGroupId,
+            groupId: finalGroupId,
             number: 2, // Used to differentiate grand final and consolation final matches in the same final group.
         });
     }
@@ -640,7 +640,7 @@ export class BaseGetter {
         )
             return []; // Current match is the last grand final match.
 
-        return [await this.findMatch(match.group_id, roundNumber + 1, 1)];
+        return [await this.findMatch(match.groupId, roundNumber + 1, 1)];
     }
 
     /**
@@ -655,7 +655,7 @@ export class BaseGetter {
     ): Promise<Match[]> {
         return [
             await this.getParallelMatch(
-                match.group_id,
+                match.groupId,
                 roundNumber,
                 match.number,
             ),
@@ -674,7 +674,7 @@ export class BaseGetter {
     ): Promise<Match[]> {
         return [
             await this.getDiagonalMatch(
-                match.group_id,
+                match.groupId,
                 roundNumber,
                 match.number,
             ),
@@ -725,7 +725,7 @@ export class BaseGetter {
     private async getUpperBracketFirstRound(stageId: Id): Promise<Round> {
         // Considering the database is ordered, this round will always be the first round of the upper bracket.
         const firstRound = await roundDb.getFirst(this.db, {
-            stage_id: stageId,
+            stageId: stageId,
             number: 1,
         });
         if (!firstRound) throw Error('Round not found.');
@@ -738,7 +738,7 @@ export class BaseGetter {
      * @param groupId ID of the group.
      */
     private async getLastRound(groupId: Id): Promise<Round> {
-        const round = await roundDb.getLast(this.db, { group_id: groupId });
+        const round = await roundDb.getLast(this.db, { groupId: groupId });
         if (!round) throw Error('Error getting rounds.');
         return round;
     }
@@ -758,7 +758,7 @@ export class BaseGetter {
                 ? 2 /* single bracket + final */
                 : 3; /* winner bracket + loser bracket + final */
         const finalGroup = await groupDb.getFirst(this.db, {
-            stage_id: stageId,
+            stageId: stageId,
             number: groupNumber,
         });
         if (!finalGroup) return null;
@@ -772,7 +772,7 @@ export class BaseGetter {
      */
     protected async getUpperBracket(stageId: Id): Promise<Group> {
         const winnerBracket = await groupDb.getFirst(this.db, {
-            stage_id: stageId,
+            stageId: stageId,
             number: 1,
         });
         if (!winnerBracket) throw Error('Winner bracket not found.');
@@ -785,7 +785,7 @@ export class BaseGetter {
      * @param stageId ID of the stage.
      */
     protected async getLoserBracket(stageId: Id): Promise<Group | null> {
-        return groupDb.getFirst(this.db, { stage_id: stageId, number: 2 });
+        return groupDb.getFirst(this.db, { stageId: stageId, number: 2 });
     }
 
     /**
@@ -841,14 +841,14 @@ export class BaseGetter {
         matchNumber: number,
     ): Promise<Match> {
         const round = await roundDb.getFirst(this.db, {
-            group_id: groupId,
+            groupId: groupId,
             number: roundNumber,
         });
 
         if (!round) throw Error('Round not found.');
 
         const match = await matchDb.getFirst(this.db, {
-            round_id: round.id,
+            roundId: round.id,
             number: matchNumber,
         });
 
@@ -858,7 +858,7 @@ export class BaseGetter {
     }
 
     /**
-     * Finds a match game based on its `id` or based on the combination of its `parent_id` and `number`.
+     * Finds a match game based on its `id` or based on the combination of its `parentId` and `number`.
      *
      * @param game Values to change in a match game.
      */
@@ -871,9 +871,9 @@ export class BaseGetter {
             return stored;
         }
 
-        if (game.parent_id !== undefined && game.number) {
+        if (game.parentId !== undefined && game.number) {
             const stored = await matchGameDb.getFirst(this.db, {
-                parent_id: game.parent_id,
+                parentId: game.parentId,
                 number: game.number,
             });
 

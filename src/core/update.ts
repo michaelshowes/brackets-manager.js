@@ -84,7 +84,7 @@ export class Update extends BaseUpdater {
         const round = await roundDb.getById(this.db, roundId);
         if (!round) throw Error('This round does not exist.');
 
-        const stage = await stageDb.getById(this.db, round.stage_id);
+        const stage = await stageDb.getById(this.db, round.stageId);
         if (!stage) throw Error('Stage not found.');
 
         helpers.ensureNotRoundRobin(stage);
@@ -182,12 +182,12 @@ export class Update extends BaseUpdater {
         if (matches.some((match) => match.status > Status.Ready))
             throw Error('At least one match has started or is completed.');
 
-        const stage = await stageDb.getById(this.db, round.stage_id);
+        const stage = await stageDb.getById(this.db, round.stageId);
         if (!stage) throw Error('Stage not found.');
         if (stage.settings.size === undefined)
             throw Error('Undefined stage size.');
 
-        const group = await groupDb.getById(this.db, round.group_id);
+        const group = await groupDb.getById(this.db, round.groupId);
         if (!group) throw Error('Group not found.');
 
         const inLoserBracket = helpers.isLoserBracket(stage.type, group.number);
@@ -217,8 +217,8 @@ export class Update extends BaseUpdater {
     ): Promise<void> {
         await matchDb.updateByFilter(
             this.db,
-            { stage_id: stageId },
-            { child_count: childCount },
+            { stageId: stageId },
+            { childCount: childCount },
         );
 
         const matches = await matchDb.getByStage(this.db, stageId);
@@ -241,8 +241,8 @@ export class Update extends BaseUpdater {
     ): Promise<void> {
         await matchDb.updateByFilter(
             this.db,
-            { group_id: groupId },
-            { child_count: childCount },
+            { groupId: groupId },
+            { childCount: childCount },
         );
 
         const matches = await matchDb.getByGroup(this.db, groupId);
@@ -265,8 +265,8 @@ export class Update extends BaseUpdater {
     ): Promise<void> {
         await matchDb.updateByFilter(
             this.db,
-            { round_id: roundId },
-            { child_count: childCount },
+            { roundId: roundId },
+            { childCount: childCount },
         );
 
         const matches = await matchDb.getByRound(this.db, roundId);
@@ -327,8 +327,8 @@ export class Update extends BaseUpdater {
             await matchGameDb.insert(this.db, {
                 id: uuidv4(),
                 number: childCount + 1,
-                stage_id: String(match.stage_id),
-                parent_id: String(match.id),
+                stageId: String(match.stageId),
+                parentId: String(match.id),
                 status: match.status,
                 opponent1: { id: null },
                 opponent2: { id: null },
@@ -339,7 +339,7 @@ export class Update extends BaseUpdater {
 
         while (childCount > targetChildCount) {
             await matchGameDb.delete(this.db, {
-                parent_id: match.id,
+                parentId: match.id,
                 number: childCount,
             });
 
@@ -348,7 +348,7 @@ export class Update extends BaseUpdater {
 
         await matchDb.update(this.db, match.id, {
             ...match,
-            child_count: targetChildCount,
+            childCount: targetChildCount,
         });
     }
 }

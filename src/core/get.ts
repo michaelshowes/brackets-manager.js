@@ -54,7 +54,7 @@ export class Get extends BaseGetter {
 
         const participants = await participantDb.getByTournament(
             this.db,
-            stage.tournament_id,
+            stage.tournamentId,
         );
         if (!participants) throw Error('Error getting participants.');
 
@@ -115,7 +115,7 @@ export class Get extends BaseGetter {
      * @param matches A list of matches.
      */
     public async matchGames(matches: Match[]): Promise<MatchGame[]> {
-        const parentMatches = matches.filter((match) => match.child_count > 0);
+        const parentMatches = matches.filter((match) => match.childCount > 0);
 
         const matchGamesQueries = await Promise.all(
             parentMatches.map((match) =>
@@ -170,7 +170,7 @@ export class Get extends BaseGetter {
         const matches = await matchDb.getByStage(this.db, stageId);
         if (!matches) throw Error('Error getting matches.');
 
-        const matchesByRound = helpers.splitBy(matches, 'round_id');
+        const matchesByRound = helpers.splitBy(matches, 'roundId');
 
         for (const roundMatches of matchesByRound) {
             if (roundMatches.every((match) => match.status >= Status.Completed))
@@ -178,7 +178,7 @@ export class Get extends BaseGetter {
 
             const round = await roundDb.getById(
                 this.db,
-                roundMatches[0].round_id,
+                roundMatches[0].roundId,
             );
             if (!round) throw Error('Round not found.');
             return round;
@@ -220,7 +220,7 @@ export class Get extends BaseGetter {
         const matches = await matchDb.getByStage(this.db, stageId);
         if (!matches) throw Error('Error getting matches.');
 
-        const matchesByRound = helpers.splitBy(matches, 'round_id');
+        const matchesByRound = helpers.splitBy(matches, 'roundId');
         const roundCount = helpers.getUpperBracketRoundCount(
             stage.settings.size!,
         );
@@ -372,7 +372,7 @@ export class Get extends BaseGetter {
      */
     private async eliminationSeeding(stage: Stage): Promise<ParticipantSlot[]> {
         const firstRound = await roundDb.getFirst(this.db, {
-            stage_id: stage.id,
+            stageId: stage.id,
             number: 1,
         });
         if (!firstRound) throw Error('Error getting the first round.');
@@ -395,14 +395,14 @@ export class Get extends BaseGetter {
     ): Promise<RoundRobinFinalStandingsItem[]> {
         const participants = await participantDb.getByTournament(
             this.db,
-            stage.tournament_id,
+            stage.tournamentId,
         );
         if (!participants) throw Error('Error getting participants.');
 
         const matches = await matchDb.getByStage(this.db, stage.id);
         if (!matches) throw Error('Error getting matches.');
 
-        const matchesByGroup = helpers.splitBy(matches, 'group_id');
+        const matchesByGroup = helpers.splitBy(matches, 'groupId');
         const unsortedRanking = matchesByGroup.flatMap((groupMatches) => {
             const groupRanking = helpers.getRanking(
                 groupMatches,
@@ -414,7 +414,7 @@ export class Get extends BaseGetter {
             );
             return qualifiedOnly.map((item) => ({
                 ...item,
-                groupId: groupMatches[0].group_id,
+                groupId: groupMatches[0].groupId,
                 name: helpers.findParticipant(participants, item).name,
             }));
         });
@@ -442,7 +442,7 @@ export class Get extends BaseGetter {
         const [singleBracket, finalGroup] = groups;
 
         const final = matches
-            .filter((match: Match) => match.group_id === singleBracket.id)
+            .filter((match: Match) => match.groupId === singleBracket.id)
             .pop();
         if (!final) throw Error('Final not found.');
 
@@ -458,14 +458,14 @@ export class Get extends BaseGetter {
         const losers = helpers.getLosers(
             participants,
             matches.filter(
-                (match: Match) => match.group_id === singleBracket.id,
+                (match: Match) => match.groupId === singleBracket.id,
             ),
         );
         grouped.push(...losers.reverse());
 
         if (stage.settings?.consolationFinal) {
             const consolationFinal = matches
-                .filter((match: Match) => match.group_id === finalGroup.id)
+                .filter((match: Match) => match.groupId === finalGroup.id)
                 .pop();
             if (!consolationFinal) throw Error('Consolation final not found.');
 
@@ -512,12 +512,12 @@ export class Get extends BaseGetter {
 
         if (stage.settings?.grandFinal === 'none') {
             const finalWB = matches
-                .filter((match: Match) => match.group_id === winnerBracket.id)
+                .filter((match: Match) => match.groupId === winnerBracket.id)
                 .pop();
             if (!finalWB) throw Error('WB final not found.');
 
             const finalLB = matches
-                .filter((match: Match) => match.group_id === loserBracket.id)
+                .filter((match: Match) => match.groupId === loserBracket.id)
                 .pop();
             if (!finalLB) throw Error('LB final not found.');
 
@@ -538,7 +538,7 @@ export class Get extends BaseGetter {
             ];
         } else {
             const grandFinalMatches = matches.filter(
-                (match: Match) => match.group_id === finalGroup.id,
+                (match: Match) => match.groupId === finalGroup.id,
             );
             const decisiveMatch = helpers.getGrandFinalDecisiveMatch(
                 stage.settings?.grandFinal || 'none',
@@ -566,7 +566,7 @@ export class Get extends BaseGetter {
         const losers = helpers.getLosers(
             participants,
             matches.filter(
-                (match: Match) => match.group_id === loserBracket.id,
+                (match: Match) => match.groupId === loserBracket.id,
             ),
         );
         grouped.push(...losers.reverse());
